@@ -81,7 +81,7 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
 
     function load_people() {
         $.ajax({
-            url: "/roster/api/v1/people",
+            url: "/roster/api/v1/roster",
             dataType: "json",
             beforeSend: loading_people,
             //error: ...

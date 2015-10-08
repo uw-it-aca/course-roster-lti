@@ -1,0 +1,14 @@
+{% load templatetag_handlebars %}
+{% tplhandlebars "people-table-tmpl" %}
+{{# each people}}
+<tr>
+    <td><a class="avatar" href="{{user_url}}"{{# unless is_avatar_static}} data-avatar="{{avatar_url}}"{{/unless}}>{{# if is_avatar_static}}<img src="{{avatar_url}}"/>{{/if}}</a></td>
+    <td><a href="{{user_url}}">{{name}}</a></td>
+    <td>{{login_id}}</td>
+    <td>{{#each sections}}<div>{{this}}</div>{{/each}}</td>
+    <td>{{#each roles}}<div>{{this}}</div>{{/each}}</td>
+    <td>{{format_last_activity last_activity_at}}</td>
+    <td>{{format_total_activity total_activity_time}}</td>
+</tr>
+{{/each}}
+{% endtplhandlebars %}

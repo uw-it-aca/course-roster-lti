@@ -30,13 +30,13 @@ class CanvasAvatar(models.Model):
         Returns a tuple: url, is_static
         """
         if self.url is None or self.last_updated is None:
-            return "/people/%s/avatar" % self.user_id, False
+            return "/roster/%s/avatar" % self.user_id, False
 
         now = make_aware(datetime.now(), get_current_timezone())
         delta = now - self.last_updated
         policy = getattr(settings, "CANVAS_AVATAR_CACHE_POLICY", 60 * 60 * 4)
         if (delta.seconds > policy):
-            return "/people/%s/avatar" % self.user_id, False
+            return "/roster/%s/avatar" % self.user_id, False
 
         return self.url, True
 
@@ -67,7 +67,7 @@ class IDPhotoAvatar(models.Model):
         Returns a tuple: url, is_static
         """
         # TODO: implement cache policy, return static url
-        return "/people/%s/avatar" % self.reg_id, False
+        return "/roster/%s/avatar" % self.reg_id, False
 
     def _cache_path(self):
         bucket = self.reg_id[:3].lower()

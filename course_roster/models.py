@@ -55,7 +55,7 @@ class IDPhotoAvatar(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     def get(self):
-        img = PWS().get_idcard_photo(self.reg_id, size=50)
+        img = PWS().get_idcard_photo(self.reg_id, size=120)
         cache_path = self._cache_path()
         #os.makedirs(cache_path)
         # cache the img file

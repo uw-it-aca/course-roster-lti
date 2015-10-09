@@ -26,7 +26,9 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
 
     function loading_people(xhr) {
         var template = Handlebars.compile($("#loading-people-tmpl").html());
-        $("#people-table tbody").html(template());
+        $("#thumbnail-grid").html(template());
+    
+        xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
     }
 
     function load_dummy() {
@@ -37,7 +39,8 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
         var el = $("a.avatar:empty").first();
         if (el.length === 1) {
             $("<img/>").load(load_next_avatar).error(load_dummy)
-                       .appendTo(el).attr("src", el.attr("data-avatar"));
+                       .appendTo(el).addClass("roster-thumbnail img-responsive")
+                       .attr("src", el.attr("data-avatar"));
         }
     }
 
@@ -51,12 +54,12 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
     }
 
     function draw_people(data) {
-        var template = Handlebars.compile($("#people-table-tmpl").html()),
+        var template = Handlebars.compile($("#thumbnail-grid-tmpl").html()),
             i,
             len,
             opt;
 
-        $("#people-table tbody").html(template(data));
+        $("#thumbnail-grid").html(template(data));
 
         for (i = 0, len = data.roles.length; i < len; i++) {
             opt = data.roles[i];
@@ -64,17 +67,6 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
                          .text(opt.role + " (" + opt.count + ")")
                          .appendTo("#role-filter");
         }
-
-        $("#people-table").dataTable({
-            "aaSorting": [[ 0, "asc" ]],
-            "bPaginate": true,
-            "iDisplayLength": 25,
-            "bScrollCollapse": true,
-            "initComplete": create_filters,
-            "order": [[ 1, "asc" ]],
-            "columns": [{ "orderable": false, "searchable": false },
-                null, null, null, null, null, null]
-        }).on("draw.dt", load_next_avatar);
 
         load_next_avatar();
     }

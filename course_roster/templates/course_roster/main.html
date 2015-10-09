@@ -1,25 +1,16 @@
 {% extends 'course_roster/base.html' %}
 
 {% block content %}
-<select id="role-filter" class="form-control input-sm" style="display: none; margin-left:10px" name="role" aria-controls="people-table" aria-label="Limit search to role">
-    <option value="">All Roles</option>
-</select>
+<div class="container">
+    <h2 id="course-roster-header">Who's Who in {{course_name}}</h2>
 
-<table id="people-table" class="people-table table table-striped">
-<thead>                                                                     
-        <tr>                                                                    
-            <th></th>                                                           
-            <th>Name</th>                                                       
-            <th>Login / SIS ID</th>                                             
-            <th>Section</th>                                                    
-            <th>Role</th>                                                       
-            <th>Last Activity</th>                                              
-            <th>Total Activity</th>                                             
-        </tr>                                                                   
-    </thead>                                                                    
-    <tbody class="scrollable"></tbody>
-</table>
+    <select id="role-filter" class="form-control input-sm" style="display: none; margin-left:10px" name="role" aria-controls="people-table" aria-label="Limit search to role">
+        <option value="">All Roles</option>
+    </select>
+
+    <div id="thumbnail-grid" class="row"></div>
+</div>
 
 {% include "handlebars/course_roster/loading_people.html" %}
-{% include "handlebars/course_roster/people_table.html" %}
+{% include "handlebars/course_roster/thumbnail_grid.html" %}
 {% endblock %}

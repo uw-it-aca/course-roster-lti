@@ -4,8 +4,9 @@ from restclients.canvas.users import Users
 from restclients.pws import PWS
 from datetime import datetime
 from django.utils.timezone import make_aware, get_current_timezone
-from os import makedirs
 from urllib3 import PoolManager
+import random
+import string
 
 
 class CanvasAvatar(models.Model):
@@ -51,24 +52,19 @@ class CanvasAvatar(models.Model):
 class IDPhotoAvatar(models.Model):
     """ Handles cacheing idphoto avatars for Canvas users.
     """
-    reg_id = models.CharField(max_length=32, unique=True)
-    last_updated = models.DateTimeField(auto_now=True)
+    url_key = models.CharField(max_length=16, unique=True)
+    reg_id = models.CharField(max_length=32)
+    date_created = models.DateTimeField(auto_now=True)
 
     def get(self):
-        img = PWS().get_idcard_photo(self.reg_id, size=120)
-        cache_path = self._cache_path()
-        #os.makedirs(cache_path)
-        # cache the img file
-        #self.save()
-        return img
+        self.delete()
+        return PWS().get_idcard_photo(self.reg_id, size=120)
 
     def get_url(self):
+        """Returns a url for the ID photo
         """
-        Returns a tuple: url, is_static
-        """
-        # TODO: implement cache policy, return static url
-        return "/roster/%s/avatar" % self.reg_id, False
-
-    def _cache_path(self):
-        bucket = self.reg_id[:3].lower()
-        return "/data/canvas/static/photos/%s" % bucket
+        if not self.url_key:
+            self.url_key = ''.join(random.SystemRandom().choice(
+                string.ascii_lowercase + string.digits) for _ in range(16))
+            self.save()
+        return "/roster/photos/%s" % self.url_key

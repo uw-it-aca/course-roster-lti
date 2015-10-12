@@ -32,7 +32,7 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
     }
 
     function load_dummy() {
-        $(this).attr("src", window.course_roster.dummy_avatar);
+        $(this).attr("src", window.course_roster.nophoto_url);
     }
 
     function load_next_avatar() {

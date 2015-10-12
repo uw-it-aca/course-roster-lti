@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
@@ -45,35 +46,18 @@ def Main(request, template='course_roster/main.html'):
     return HttpResponse(t.render(c), status=status_code)
 
 
-def Avatar(request, user_id):
-    user_policy = UserPolicy()
-    #try:
-    #    blti = BLTI().get_session(request)
-    #except Exception as err:
-    #    return HttpResponse(status=401)
-
+def IDPhoto(request, photo_key):
     try:
-        user_policy.valid_reg_id(user_id)
-        avatar = IDPhotoAvatar(reg_id=user_id)
-        return HttpResponse(avatar.get(), content_type='image/jpeg')
+        return HttpResponse(IDPhotoAvatar.objects.get(url_key=photo_key).get(),
+                            content_type='image/jpeg')
     except DataFailureException as err:
         return HttpResponse(status=err.status)
-    except UserPolicyException as err:
-        try:
-            user_policy.valid_canvas_id(user_id)
-            avatar, created = CanvasAvatar.objects.get_or_create(
-                user_id=user_id)
-            response = avatar.get()
-            return HttpResponse(response.data, response.getheaders())
-
-        except UserPolicyException as err:
-            return HttpResponse(status=400)
-        except Exception as err:
-            print err
-            return HttpResponse(status=500)
+    except IDPhotoAvatar.DoesNotExist:
+        return HttpResponse(status=404)
 
 
 class CourseRoster(RESTDispatch):
+    @transaction.atomic
     def GET(self, request, **kwargs):
         page = kwargs.get('page', 1)
         try:
@@ -93,7 +77,8 @@ class CourseRoster(RESTDispatch):
 
         people = {}
         role_counts = {}
-        dummy_avatar_url = static('course_roster/img/dummy.png')
+        no_photo_url = static('course_roster/img/nophoto.png')
+        policy = UserPolicy()
         for enrollment in enrollments:
             #section_name = section_lookup[enrollment.section_id].name
 
@@ -108,13 +93,11 @@ class CourseRoster(RESTDispatch):
 
             else:
                 try:
-                    UserPolicy().valid_reg_id(enrollment.sis_user_id)
-                    avatar_url, is_static = IDPhotoAvatar(
-                        reg_id=enrollment.sis_user_id).get_url()
+                    policy.valid_reg_id(enrollment.sis_user_id)
+                    avatar_url = IDPhotoAvatar(reg_id=enrollment.sis_user_id).get_url()
 
-                except UserPolicyException as err:
-                    avatar_url = dummy_avatar_url 
-                    is_static = True
+                except UserPolicyException:
+                    avatar_url = no_photo_url
                     #try:
                     #    avatar = CanvasAvatar.objects.get(
                     #        user_id=enrollment.user_id)
@@ -126,7 +109,6 @@ class CourseRoster(RESTDispatch):
                 people[enrollment.user_id] = {
                     'user_url': enrollment.html_url,
                     'avatar_url': avatar_url,
-                    'is_avatar_static': is_static,
                     #'sections': [section_name],
                     'roles': [enrollment.role],
                     'login_id': enrollment.login_id,

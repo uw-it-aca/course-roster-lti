@@ -2,8 +2,8 @@
 {% tplhandlebars "thumbnail-grid-tmpl" %}
 {{# each people}}
 <div class="col-lg-2 col-sm-3 col-xs-4">
-    <a class="avatar" href="{{user_url}}"{{# unless is_avatar_static}} data-avatar="{{avatar_url}}"{{/unless}}>{{# if is_avatar_static}}<img src="{{avatar_url}}" class="roster-thumbnail img-responsive"/>{{/if}}</a>
-    <a href="{{user_url}}">{{name}} {{login_id}}</a>
+    <a class="avatar" href="{{user_url}}" target="_top" data-avatar="{{avatar_url}}"></a>
+    <a class="person-name" href="{{user_url}}" target="_top">{{name}}</a>
 </div>
 {{/each}}
 {% endtplhandlebars %}

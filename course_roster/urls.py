@@ -4,6 +4,6 @@ from course_roster.views import CourseRoster
 
 urlpatterns = patterns('course_roster.views',
     url(r'^$', 'Main'),
-    url(r'^(?P<user_id>[^/]*)/avatar$', 'Avatar'),
+    url(r'^photos/(?P<photo_key>[a-z0-9]*)$', 'IDPhoto'),
     url(r'^api/v1/roster', CourseRoster().run),
 )

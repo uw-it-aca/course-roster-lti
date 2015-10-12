@@ -9,7 +9,11 @@
     {% load compress %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'course_roster/vendor/css/bootstrap-3.3.1.min.css' %}" />
+    {% compress css %}
     <link rel="stylesheet" type="text/less" href="{% static 'course_roster/css/mobile.less' %}" media="screen, handheld" />
+    <link rel="stylesheet" type="text/less" href="{% static 'course_roster/css/desktop.less' %}" media="screen and (min-width: 480px)" />
+    <link rel="stylesheet" type="text/less" href="{% static 'course_roster/css/blti.less' %}" media="screen and (min-width: 480px)" />
+    {% endcompress %}
 </head>
 <body>
     <div id="wrapper" class="container" style="position:relative;">
@@ -31,7 +35,7 @@
     <script type="text/javascript">
         window.course_roster = {
             session_id: '{{ session_id }}',
-            dummy_avatar: "{% static 'course_roster/img/dummy.png' %}"
+            nophoto_url: "{% static 'course_roster/img/nophoto.png' %}"
         };
     </script>
 </body>

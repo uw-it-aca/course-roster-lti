@@ -63,8 +63,8 @@ class CourseRoster(RESTDispatch):
             blti = BLTI().get_session(request)
             course_id = blti.get('canvas_course_id', None)
             #sections = Sections().get_sections_in_course(course_id)
-            enrollments = Enrollments().get_enrollments_for_course(course_id,
-                {'page': page, 'per_page': 100})
+            enrollments = Enrollments().get_enrollments_for_course(
+                course_id, {'page': page, 'per_page': 100})
         except DataFailureException as err:
             return self.error_response(500, err)
         except Exception as err:
@@ -88,27 +88,24 @@ class CourseRoster(RESTDispatch):
             if enrollment.user_id in people:
                 #people[enrollment.user_id]['sections'].append(section_name)
                 people[enrollment.user_id]['roles'].append(enrollment.role)
+                continue
 
-            else:
-                try:
-                    policy.valid_reg_id(enrollment.sis_user_id)
-                    photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
+            try:
+                policy.valid_reg_id(enrollment.sis_user_id)
+                photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
 
-                except UserPolicyException:
-                    photo_url = IDPhoto().get_nophoto_url()
+            except UserPolicyException:
+                photo_url = IDPhoto().get_nophoto_url()
 
-                people[enrollment.user_id] = {
-                    'user_url': enrollment.html_url,
-                    'photo_url': photo_url,
-                    #'sections': [section_name],
-                    'roles': [enrollment.role],
-                    'login_id': enrollment.login_id,
-                    #'sis_user_id': enrollment.sis_user_id,
-                    'name': enrollment.name,
-                    #'total_activity_time': enrollment.total_activity_time,
-                    #'last_activity_at': enrollment.last_activity_at.isoformat() if (
-                    #    enrollment.last_activity_at is not None) else None,
-                }
+            people[enrollment.user_id] = {
+                'user_url': enrollment.html_url,
+                'photo_url': photo_url,
+                #'sections': [section_name],
+                'roles': [enrollment.role],
+                'login_id': enrollment.login_id,
+                'name': enrollment.name,
+                'sortable_name': enrollment.sortable_name,
+            }
 
         roles = []
         for role in sorted(role_counts.iterkeys()):
@@ -118,7 +115,8 @@ class CourseRoster(RESTDispatch):
             })
 
         data = {
-            'people': people.values(),
+            'people': sorted(people.values(),
+                             key=lambda p: p['sortable_name']),
             'roles': roles,
         }
 

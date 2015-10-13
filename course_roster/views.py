@@ -3,14 +3,13 @@ from django.http import HttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
 #from restclients.canvas.sections import Sections
 from restclients.canvas.enrollments import Enrollments
 from restclients.exceptions import DataFailureException
-from course_roster.models import CanvasAvatar, IDPhotoAvatar
+from course_roster.models import IDPhoto
 import logging
 
 
@@ -46,13 +45,13 @@ def Main(request, template='course_roster/main.html'):
     return HttpResponse(t.render(c), status=status_code)
 
 
-def IDPhoto(request, photo_key):
+def RosterPhoto(request, photo_key):
     try:
-        return HttpResponse(IDPhotoAvatar.objects.get(url_key=photo_key).get(),
+        return HttpResponse(IDPhoto.objects.get(url_key=photo_key).get(),
                             content_type='image/jpeg')
     except DataFailureException as err:
         return HttpResponse(status=err.status)
-    except IDPhotoAvatar.DoesNotExist:
+    except IDPhoto.DoesNotExist:
         return HttpResponse(status=404)
 
 
@@ -77,7 +76,6 @@ class CourseRoster(RESTDispatch):
 
         people = {}
         role_counts = {}
-        no_photo_url = static('course_roster/img/nophoto.png')
         policy = UserPolicy()
         for enrollment in enrollments:
             #section_name = section_lookup[enrollment.section_id].name
@@ -94,29 +92,22 @@ class CourseRoster(RESTDispatch):
             else:
                 try:
                     policy.valid_reg_id(enrollment.sis_user_id)
-                    avatar_url = IDPhotoAvatar(reg_id=enrollment.sis_user_id).get_url()
+                    photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
 
                 except UserPolicyException:
-                    avatar_url = no_photo_url
-                    #try:
-                    #    avatar = CanvasAvatar.objects.get(
-                    #        user_id=enrollment.user_id)
-                    #    avatar_url, is_static = avatar.get_url()
-                    #except CanvasAvatar.DoesNotExist:
-                    #    avatar_url, is_static = CanvasAvatar(
-                    #        user_id=enrollment.user_id).get_url()
+                    photo_url = IDPhoto().get_nophoto_url()
 
                 people[enrollment.user_id] = {
                     'user_url': enrollment.html_url,
-                    'avatar_url': avatar_url,
+                    'photo_url': photo_url,
                     #'sections': [section_name],
                     'roles': [enrollment.role],
                     'login_id': enrollment.login_id,
-                    'sis_user_id': enrollment.sis_user_id,
+                    #'sis_user_id': enrollment.sis_user_id,
                     'name': enrollment.name,
-                    'total_activity_time': enrollment.total_activity_time,
-                    'last_activity_at': enrollment.last_activity_at.isoformat() if (
-                        enrollment.last_activity_at is not None) else None,
+                    #'total_activity_time': enrollment.total_activity_time,
+                    #'last_activity_at': enrollment.last_activity_at.isoformat() if (
+                    #    enrollment.last_activity_at is not None) else None,
                 }
 
         roles = []

@@ -35,12 +35,12 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
         $(this).attr("src", window.course_roster.nophoto_url);
     }
 
-    function load_next_avatar() {
-        var el = $("a.avatar:empty").first();
+    function load_next_photo() {
+        var el = $("a.person-photo:empty").first();
         if (el.length === 1) {
-            $("<img/>").load(load_next_avatar).error(load_dummy)
+            $("<img/>").load(load_next_photo).error(load_dummy)
                        .appendTo(el).addClass("roster-thumbnail img-responsive")
-                       .attr("src", el.attr("data-avatar"));
+                       .attr("src", el.attr("data-photo"));
         }
     }
 
@@ -68,7 +68,7 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
                          .appendTo("#role-filter");
         }
 
-        load_next_avatar();
+        load_next_photo();
     }
 
     function load_people() {

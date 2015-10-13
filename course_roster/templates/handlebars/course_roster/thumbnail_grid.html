@@ -1,9 +1,9 @@
 {% load templatetag_handlebars %}
 {% tplhandlebars "thumbnail-grid-tmpl" %}
 {{# each people}}
-<div class="col-lg-2 col-sm-3 col-xs-4">
+<div class="col-sm-2 col-xs-3" style="margin-bottom: 30px;">
     <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}"></a>
-    <a class="person-name" href="{{user_url}}" target="_top">{{name}}</a>
+    <div style="white-space: nowrap;"><a class="person-name" href="{{user_url}}" target="_top">{{name}}</a></div>
 </div>
 {{/each}}
 {% endtplhandlebars %}

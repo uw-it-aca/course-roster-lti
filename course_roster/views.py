@@ -61,14 +61,22 @@ class CourseRoster(RESTDispatch):
     @transaction.atomic
     def GET(self, request, **kwargs):
         course_id = kwargs.get('canvas_course_id')
-        page = kwargs.get('page', 1)
+        section_id = request.GET.get('canvas_section_id', None)
+        page = request.GET.get('page', 1)
+
+        search_params = {
+            'page': page,
+            'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
+        }
+
+        canvas = Enrollments()
         try:
-            search_params = {
-                'page': page,
-                'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
-            }
-            enrollments = Enrollments().get_enrollments_for_course(
-                course_id, search_params)
+            if section_id is not None and len(section_id):
+                enrollments = canvas.get_enrollments_for_section(
+                    section_id, search_params)
+            else:
+                enrollments = canvas.get_enrollments_for_course(
+                    course_id, search_params)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
@@ -78,6 +86,15 @@ class CourseRoster(RESTDispatch):
         for enrollment in enrollments:
             if enrollment.user_id in seen_people:
                 continue
+            seen_people[enrollment.user_id] = None
+
+            try:
+                policy.valid_net_id(enrollment.login_id)
+            except UserPolicyException:
+                try:
+                    policy.valid_gmail_id(enrollment.login_id)
+                except UserPolicyException:
+                    continue
 
             try:
                 policy.valid_reg_id(enrollment.sis_user_id)
@@ -92,7 +109,6 @@ class CourseRoster(RESTDispatch):
                 'login_id': enrollment.login_id,
                 'name': enrollment.name,
             })
-            seen_people[enrollment.user_id] = None
 
         return self.json_response({'people': people})
 

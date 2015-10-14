@@ -31,9 +31,14 @@
     }
 
     function load_course_people(course_id, filter_params) {
+        var url = "api/v1/course/" + course_id + "/people";
+        if (filter_params !== undefined && !$.isEmptyObject(filter_params)) {
+            url += "?" + $.param(filter_params);
+        }
+
         $.ajax({
             type: "GET",
-            url: "api/v1/course/" + course_id + "/people",
+            url: url,
             dataType: "json",
             beforeSend: loading_people,
             //error: ...
@@ -43,6 +48,7 @@
 
     function load_section_people() {
         var course_id = window.course_roster.canvas_course_id;
+        $("#thumbnail-grid").empty();
         load_course_people(course_id, {'canvas_section_id': $(this).val()});
     }
 

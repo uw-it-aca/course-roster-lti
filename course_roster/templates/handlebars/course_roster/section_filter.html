@@ -1,0 +1,10 @@
+{% load templatetag_handlebars %}
+{% tplhandlebars "section-filter-tmpl" %}
+<label class="control-label text-right col-sm-2" for="course-section-selector">Section</label>
+<div class="col-sm-10">
+    <select id="course-section-selector" class="form-control">
+        <option value="">All Sections</option>{{# each sections}}
+        <option value="{{ id }}">{{ name }}</option>{{/each}}
+    </select>
+</div>
+{% endtplhandlebars %}

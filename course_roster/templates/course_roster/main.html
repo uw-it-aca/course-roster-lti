@@ -4,8 +4,10 @@
 <div class="course-roster-container">
     <h2 id="course-roster-header">Who's Who in {{course_name}}</h2>
 
-    <div class="search-container">
+    <div class="form-group row">
         <input type="text" aria-label="Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input." placeholder="Search people" data-view="inputFilter" name="search_term"/>
+
+        <div id="section-filter"></div>
     </div>
 
     <div class="container-fluid">
@@ -14,5 +16,6 @@
     </div>
 </div>
 
+{% include "handlebars/course_roster/section_filter.html" %}
 {% include "handlebars/course_roster/thumbnail_grid.html" %}
 {% endblock %}

@@ -8,6 +8,7 @@ from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
 from restclients.canvas.enrollments import Enrollments
+from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
 from course_roster.models import IDPhoto
 import logging
@@ -32,6 +33,7 @@ def Main(request, template='course_roster/main.html'):
                          sis_user_id=canvas_sis_user_id,
                          canvas_course_id=canvas_course_id)
 
+        params['canvas_course_id'] = canvas_course_id
         params['course_name'] = blti_data.get('context_label', 'this course')
         params['session_id'] = request.session.session_key
     except Exception as err:
@@ -58,10 +60,9 @@ def RosterPhoto(request, photo_key):
 class CourseRoster(RESTDispatch):
     @transaction.atomic
     def GET(self, request, **kwargs):
+        course_id = kwargs.get('canvas_course_id')
         page = kwargs.get('page', 1)
         try:
-            blti = BLTI().get_session(request)
-            course_id = blti.get('canvas_course_id', None)
             search_params = {
                 'page': page,
                 'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
@@ -69,9 +70,7 @@ class CourseRoster(RESTDispatch):
             enrollments = Enrollments().get_enrollments_for_course(
                 course_id, search_params)
         except DataFailureException as err:
-            return self.error_response(500, err)
-        except Exception as err:
-            return self.error_response(400, err)
+            return self.error_response(500, err.msg)
 
         people = []
         seen_people = {}
@@ -96,3 +95,25 @@ class CourseRoster(RESTDispatch):
             seen_people[enrollment.user_id] = None
 
         return self.json_response({'people': people})
+
+
+class CourseSections(RESTDispatch):
+    """ Performs actions on Canvas Course Sections
+        GET returns 200 with course sections.
+    """
+    def GET(self, request, **kwargs):
+        course_id = kwargs['canvas_course_id']
+        sections = []
+
+        try:
+            for section in Sections().get_sections_in_course(course_id):
+                sections.append({
+                    'id': section.section_id,
+                    'sis_id': section.sis_section_id,
+                    'name': section.name
+                })
+        except DataFailureException as err:
+            return self.error_response(500, err.msg)
+
+        return self.json_response({'sections': sorted(
+            sections, key=lambda k: k['name'])})

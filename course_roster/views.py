@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse
 from django.template import Context, loader
@@ -6,7 +7,6 @@ from django.core.context_processors import csrf
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
-#from restclients.canvas.sections import Sections
 from restclients.canvas.enrollments import Enrollments
 from restclients.exceptions import DataFailureException
 from course_roster.models import IDPhoto
@@ -62,32 +62,22 @@ class CourseRoster(RESTDispatch):
         try:
             blti = BLTI().get_session(request)
             course_id = blti.get('canvas_course_id', None)
-            #sections = Sections().get_sections_in_course(course_id)
+            search_params = {
+                'page': page,
+                'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
+            }
             enrollments = Enrollments().get_enrollments_for_course(
-                course_id, {'page': page, 'per_page': 100})
+                course_id, search_params)
         except DataFailureException as err:
             return self.error_response(500, err)
         except Exception as err:
             return self.error_response(400, err)
 
-        #section_lookup = {}
-        #for section in sections:
-        #    section_lookup[section.section_id] = section
-
-        people = {}
-        role_counts = {}
+        people = []
+        seen_people = {}
         policy = UserPolicy()
         for enrollment in enrollments:
-            #section_name = section_lookup[enrollment.section_id].name
-
-            if enrollment.role in role_counts:
-                role_counts[enrollment.role] += 1
-            else:
-                role_counts[enrollment.role] = 1
-
-            if enrollment.user_id in people:
-                #people[enrollment.user_id]['sections'].append(section_name)
-                people[enrollment.user_id]['roles'].append(enrollment.role)
+            if enrollment.user_id in seen_people:
                 continue
 
             try:
@@ -97,27 +87,12 @@ class CourseRoster(RESTDispatch):
             except UserPolicyException:
                 photo_url = IDPhoto().get_nophoto_url()
 
-            people[enrollment.user_id] = {
+            people.append({
                 'user_url': enrollment.html_url,
                 'photo_url': photo_url,
-                #'sections': [section_name],
-                'roles': [enrollment.role],
                 'login_id': enrollment.login_id,
                 'name': enrollment.name,
-                'sortable_name': enrollment.sortable_name,
-            }
-
-        roles = []
-        for role in sorted(role_counts.iterkeys()):
-            roles.append({
-                'role': role,
-                'count': role_counts.get(role, 0)
             })
+            seen_people[enrollment.user_id] = None
 
-        data = {
-            'people': sorted(people.values(),
-                             key=lambda p: p['sortable_name']),
-            'roles': roles,
-        }
-
-        return self.json_response(data)
+        return self.json_response({'people': people})

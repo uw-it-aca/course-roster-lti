@@ -32,7 +32,7 @@ def Main(request, template='course_roster/main.html'):
                          sis_user_id=canvas_sis_user_id,
                          canvas_course_id=canvas_course_id)
 
-        params['course_name'] = blti_data.get('context_title', 'this course')
+        params['course_name'] = blti_data.get('context_label', 'this course')
         params['session_id'] = request.session.session_key
     except Exception as err:
         template = 'blti/error.html'

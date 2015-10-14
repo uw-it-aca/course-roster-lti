@@ -4,9 +4,9 @@
 <div class="course-roster-container">
     <h2 id="course-roster-header">Who's Who in {{course_name}}</h2>
 
-    <select id="role-filter" class="form-control input-sm" style="display: none; margin-left:10px" name="role" aria-controls="people-table" aria-label="Limit search to role">
-        <option value="">All Roles</option>
-    </select>
+    <div class="search-container">
+        <input type="text" aria-label="Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input." placeholder="Search people" data-view="inputFilter" name="search_term"/>
+    </div>
 
     <div class="container-fluid">
         <div id="thumbnail-grid" class="row"></div>

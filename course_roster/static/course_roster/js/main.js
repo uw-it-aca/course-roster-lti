@@ -25,9 +25,8 @@ Handlebars.registerHelper("format_total_activity", function (sec) {
     "use strict";
 
     function loading_people(xhr) {
-        var template = Handlebars.compile($("#loading-people-tmpl").html());
-        $("#thumbnail-grid").html(template());
-    
+        // TODO: add spinner
+
         xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
     }
 

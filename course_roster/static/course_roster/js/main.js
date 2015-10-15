@@ -1,5 +1,5 @@
 /*jslint browser: true, plusplus: true */
-/*global jQuery, Handlebars, moment */
+/*global jQuery, Handlebars */
 (function ($) {
     "use strict";
 
@@ -14,10 +14,15 @@
         $(this).attr("src", window.course_roster.nophoto_url);
     }
 
+    function show_person() {
+        $(this).closest('div.person-container').show();
+        load_next_photo();
+    }
+
     function load_next_photo() {
         var el = $("a.person-photo:empty").first();
         if (el.length === 1) {
-            $("<img/>").load(load_next_photo).error(load_dummy)
+            $("<img/>").load(show_person).error(load_dummy)
                        .appendTo(el).addClass("roster-thumbnail img-responsive")
                        .attr("src", el.attr("data-photo"));
         } else {
@@ -47,11 +52,11 @@
     }
 
     function load_section_people() {
-        var course_id = window.course_roster.canvas_course_id;
+        var course_id = window.course_roster.canvas_course_id,
+            section_id = $(this).val();
         $("#thumbnail-grid").empty();
-        load_course_people(course_id, {'canvas_section_id': $(this).val()});
+        load_course_people(course_id, {'canvas_section_id': section_id});
     }
-
 
     function loading_sections(xhr) {
         xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);

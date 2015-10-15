@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
@@ -52,10 +52,11 @@ def Main(request, template='course_roster/main.html'):
 
 def RosterPhoto(request, photo_key):
     try:
-        return HttpResponse(IDPhoto.objects.get(url_key=photo_key).get(),
-                            content_type='image/jpeg')
+        return StreamingHttpResponse(
+            IDPhoto.objects.get(url_key=photo_key).get(),
+            content_type='image/jpeg')
     except DataFailureException as err:
-        return HttpResponse(status=500)
+        return HttpResponse(status=err.status)
     except IDPhoto.DoesNotExist:
         return HttpResponse(status=404)
 

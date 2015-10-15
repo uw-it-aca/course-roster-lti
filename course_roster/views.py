@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
@@ -15,6 +16,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+NOPHOTO_URL = static('course_roster/img/nophoto.jpg')
 
 
 @csrf_exempt
@@ -35,6 +37,7 @@ def Main(request, template='course_roster/main.html'):
 
         params['canvas_course_id'] = canvas_course_id
         params['course_name'] = blti_data.get('context_label', 'this course')
+        params['nophoto_url'] = NOPHOTO_URL
         params['session_id'] = request.session.session_key
     except Exception as err:
         template = 'blti/error.html'
@@ -52,7 +55,7 @@ def RosterPhoto(request, photo_key):
         return HttpResponse(IDPhoto.objects.get(url_key=photo_key).get(),
                             content_type='image/jpeg')
     except DataFailureException as err:
-        return HttpResponse(status=err.status)
+        return HttpResponse(status=500)
     except IDPhoto.DoesNotExist:
         return HttpResponse(status=404)
 
@@ -62,6 +65,7 @@ class CourseRoster(RESTDispatch):
     def GET(self, request, **kwargs):
         course_id = kwargs.get('canvas_course_id')
         section_id = request.GET.get('canvas_section_id', None)
+        search_term = request.GET.get('search_term', None)
         page = request.GET.get('page', 1)
 
         search_params = {
@@ -74,9 +78,19 @@ class CourseRoster(RESTDispatch):
             if section_id is not None and len(section_id):
                 enrollments = canvas.get_enrollments_for_section(
                     section_id, search_params)
+
+            elif course_id is not None and len(course_id):
+                if search_term is not None and len(search_term):
+                    search_params['search_term'] = search_term
+                    #enrollments = canvas.search_enrollments_for_course(
+                    #    course_id, search_params)
+                else:
+                    enrollments = canvas.get_enrollments_for_course(
+                        course_id, search_params)
+
             else:
-                enrollments = canvas.get_enrollments_for_course(
-                    course_id, search_params)
+                return self.error_response(400, 'Missing course or section ID')
+
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
@@ -94,7 +108,7 @@ class CourseRoster(RESTDispatch):
             except UserPolicyException:
                 try:
                     policy.valid_gmail_id(enrollment.login_id)
-                    photo_url = IDPhoto().get_nophoto_url()
+                    photo_url = NOPHOTO_URL
                 except UserPolicyException:
                     continue
 

@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from restclients.pws import PWS
 import random
 import string
@@ -24,6 +23,3 @@ class IDPhoto(models.Model):
                 string.ascii_lowercase + string.digits) for _ in range(16))
             self.save()
         return "/roster/photos/%s" % self.url_key
-
-    def get_nophoto_url(self):
-        return static('course_roster/img/nophoto.png')

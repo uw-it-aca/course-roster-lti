@@ -89,19 +89,14 @@ class CourseRoster(RESTDispatch):
             seen_people[enrollment.user_id] = None
 
             try:
-                policy.valid_net_id(enrollment.login_id)
+                policy.valid_reg_id(enrollment.sis_user_id)
+                photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
             except UserPolicyException:
                 try:
                     policy.valid_gmail_id(enrollment.login_id)
+                    photo_url = IDPhoto().get_nophoto_url()
                 except UserPolicyException:
                     continue
-
-            try:
-                policy.valid_reg_id(enrollment.sis_user_id)
-                photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
-
-            except UserPolicyException:
-                photo_url = IDPhoto().get_nophoto_url()
 
             people.append({
                 'user_url': enrollment.html_url,

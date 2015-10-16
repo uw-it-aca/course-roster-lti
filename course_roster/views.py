@@ -82,9 +82,8 @@ class CourseRoster(RESTDispatch):
 
             elif course_id is not None and len(course_id):
                 if search_term is not None and len(search_term):
-                    search_params['search_term'] = search_term
-                    #enrollments = canvas.search_enrollments_for_course(
-                    #    course_id, search_params)
+                    enrollments = canvas.search_enrollments_for_course(
+                        course_id, search_term, search_params)
                 else:
                     enrollments = canvas.get_enrollments_for_course(
                         course_id, search_params)

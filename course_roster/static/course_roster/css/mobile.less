@@ -1,116 +1,21 @@
 // mobile first styles
+body { background: none; font: 13px/1.5 "Helvetica Neue",Arial,"Liberation Sans",FreeSans,sans-serif; }
+.container { margin: 0; }                                                       
+#main-wrapper { margin: 0; float: none; max-width: 940px; box-shadow: none; -webkit-box-shadow: none; height: auto !important; }
+.inner { margin: 0 1em !important; }                                            
+                                                                                
+                                                                                
+#main-wrapper {                                                                 
+                                                                                
+    h2 { text-transform: none; color: #444; font-size: 1.8em; margin-bottom: 1.25em; line-height: 1.25; font-weight: normal; }
+    h3 { text-transform: none; color: #555; font-size: 1.5em; margin-bottom: 1.25em; line-height: 1.25; font-weight: normal; }
+}                                                                               
+                                                                                
+#main {                                                                         
+                                                                                
+    .course-roster-container {                                                  
+                                                                                
+    }                                                                           
+                                                                                
+} 
 
-.badge {  padding: 2px 5px 2px; font-weight: normal; }
-
-
-body { padding: 0; margin: 0; background: url('../img/bg.jpg'); }
-
-.inner { margin: 0 20px; }
-
-
-#header { line-height: 70px;
-
-    .inner { margin-bottom: 0;
-        .app-logo { color: #666; text-transform: uppercase; font-size: 26px; font-weight: bold; background: url('../img/canvas-logo.png') no-repeat left center; width: 111px; height: 70px;
-        background-size: 110px; }
-
-        .app-user { margin-left: 10px;
-            .btn { margin-top: -3px; }
-        }
-    }
-
-}
-
-#intro { margin-bottom: 1em; background-color: #39275B; color: #fff; border-color: #333;
-    h2 { margin-bottom: 0.4em; }
-    .lead { margin: 0; padding-bottom: 1em; font-size: 17px; line-height: 24px; }
-}
-
-#side-wrapper { color: #888;
-
-}
-
-#main-wrapper { background: #fff; padding-top: .5em;
-
-    h2 { text-transform: uppercase; color: #666; font-size: 16px; }
-    h3 { font-weight: normal; font-size: 14px; margin-bottom: 0; }
-    input[type="text"], select { margin-bottom: 0; }
-
-}
-
-#main {
-    .alert-info { color: #333;
-        a { text-decoration: underline; }
-    }
-
-    h1 { line-height: 70px;  }
-}
-
-#footer { color: #bbb; margin: 1.5em 0; font-size: 12px;}
-
-
-.popover { background-color: #FFF5BF; }
-.popover.bottom .arrow { border-bottom-color: yellow; }
-.popover-title { display: none; }
-.popover.right .arrow:after { border-right-color: #FFF5BF;}
-
-// non-semantic helper classes - taken from html5boilerplate
-
-/*
- * Image replacement
- */
-
-.ir {
-    border: 0;
-    font: 0/0 a;
-    text-shadow: none;
-    color: transparent;
-    background-color: transparent;
-}
-
-/*
- * Hide from both screenreaders and browsers: h5bp.com/u
- */
-
-.hidden {
-    display: none !important;
-    visibility: hidden;
-}
-
-/*
- * Hide only visually, but have it available for screenreaders: h5bp.com/v
- */
-
-.visuallyhidden {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-}
-
-/*
- * Extends the .visuallyhidden class to allow the element to be focusable
- * when navigated to via the keyboard: h5bp.com/p
- */
-
-.visuallyhidden.focusable:active,
-.visuallyhidden.focusable:focus {
-    clip: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    position: static;
-    width: auto;
-}
-
-/*
- * Hide visually and from screenreaders, but maintain layout
- */
-
-.invisible {
-    visibility: hidden;
-}

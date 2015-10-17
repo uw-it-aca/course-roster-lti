@@ -35,10 +35,16 @@
         load_next_photo();
     }
 
+    function draw_error(xhr) {
+        $("span.loading").hide();
+        $("#thumbnail-grid").append("No photos");
+    }
+
     function load_course_people(course_id, filter_params) {
         var url = "api/v1/course/" + course_id + "/people";
         if (filter_params !== undefined && !$.isEmptyObject(filter_params)) {
             url += "?" + $.param(filter_params);
+            $("#thumbnail-grid").empty();
         }
 
         $.ajax({
@@ -46,16 +52,25 @@
             url: url,
             dataType: "json",
             beforeSend: loading_people,
-            //error: ...
+            error: draw_error,
             success: draw_people
         });
     }
 
-    function load_section_people() {
+    function filter_by_section() {
         var course_id = window.course_roster.canvas_course_id,
             section_id = $(this).val();
-        $("#thumbnail-grid").empty();
         load_course_people(course_id, {'canvas_section_id': section_id});
+    }
+
+    function filter_by_search() {
+        var course_id = window.course_roster.canvas_course_id,
+            search_term = $.trim($(this).val());
+
+        if (search_term.length === 0 || search_term.length > 2) {
+            $(this).val(search_term);
+            load_course_people(course_id, {'search_term': search_term});
+        }
     }
 
     function loading_sections(xhr) {
@@ -66,7 +81,7 @@
         var template = Handlebars.compile($("#section-filter-tmpl").html());
         if (data.sections.length > 1) {
             $("#section-filter").html(template(data));
-            $("#course-section-selector").change(load_section_people);
+            $("#course-section-selector").change(filter_by_section);
         }
     }
 
@@ -76,7 +91,6 @@
             url: "api/v1/course/" + course_id + "/sections",
             dataType: "json",
             beforeSend: loading_sections,
-            //error: ...
             success: draw_section_selector
         });
     }
@@ -87,9 +101,8 @@
         photo_template = Handlebars.compile($("#thumbnail-grid-tmpl").html());
         load_course_sections(course_id);
         load_course_people(course_id);
+        $("#search-filter").keyup(filter_by_search);
     }
 
-    $(document).ready(function () {
-        initialize();
-    });
+    $(document).ready(initialize);
 }(jQuery));

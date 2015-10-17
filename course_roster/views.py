@@ -119,7 +119,10 @@ class CourseRoster(RESTDispatch):
                 'name': enrollment.name,
             })
 
-        return self.json_response({'people': people})
+        if len(people):
+            return self.json_response({'people': people})
+        else:
+            return self.error_response(404)
 
 
 class CourseSections(RESTDispatch):

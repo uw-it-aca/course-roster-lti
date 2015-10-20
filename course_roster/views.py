@@ -8,10 +8,11 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
-from restclients.canvas.enrollments import Enrollments
+from restclients.canvas.users import Users
 from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
 from course_roster.models import IDPhoto
+from urlparse import urlparse, parse_qs
 import logging
 
 
@@ -64,63 +65,61 @@ def RosterPhoto(request, photo_key):
 class CourseRoster(RESTDispatch):
     @transaction.atomic
     def GET(self, request, **kwargs):
-        course_id = kwargs.get('canvas_course_id')
+        course_id = kwargs.get('canvas_course_id', None)
         section_id = request.GET.get('canvas_section_id', None)
         search_term = request.GET.get('search_term', None)
         page = request.GET.get('page', 1)
 
+        if not course_id:
+            return self.error_response(400, 'Missing course ID')
+
         search_params = {
             'page': page,
             'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
+            'include': ['enrollments'],
         }
 
-        canvas = Enrollments()
+        if search_term is not None and len(search_term):
+            search_params['search_term'] = search_term
+
+        canvas = Users()
         try:
-            if section_id is not None and len(section_id):
-                enrollments = canvas.get_enrollments_for_section(
-                    section_id, search_params)
-
-            elif course_id is not None and len(course_id):
-                if search_term is not None and len(search_term):
-                    enrollments = canvas.search_enrollments_for_course(
-                        course_id, search_term, search_params)
-                else:
-                    enrollments = canvas.get_enrollments_for_course(
-                        course_id, search_params)
-
-            else:
-                return self.error_response(400, 'Missing course or section ID')
-
+            users = canvas.get_users_for_course(course_id, search_params)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
         people = []
-        seen_people = {}
         policy = UserPolicy()
-        for enrollment in enrollments:
-            if enrollment.user_id in seen_people:
-                continue
-            seen_people[enrollment.user_id] = None
-
+        for user in users:
             try:
-                policy.valid_reg_id(enrollment.sis_user_id)
-                photo_url = IDPhoto(reg_id=enrollment.sis_user_id).get_url()
+                policy.valid_reg_id(user.sis_user_id)
+                photo_url = IDPhoto(reg_id=user.sis_user_id).get_url()
             except UserPolicyException:
                 try:
-                    policy.valid_gmail_id(enrollment.login_id)
+                    policy.valid_gmail_id(user.login_id)
                     photo_url = NOPHOTO_URL
                 except UserPolicyException:
                     continue
 
             people.append({
-                'user_url': enrollment.html_url,
+                'user_url': user.enrollments[0].html_url,
                 'photo_url': photo_url,
-                'login_id': enrollment.login_id,
-                'name': enrollment.name,
+                'login_id': user.login_id,
+                'name': user.name,
+                'sections': [e.section_id for e in user.enrollments],
             })
 
         if len(people):
-            return self.json_response({'people': people})
+            try:
+                url_parts = urlparse(canvas.next_page_url)
+                next_page = parse_qs(url_parts.query).get('page', [])[0]
+            except Exception as err:
+                next_page = None
+
+            return self.json_response({
+                'people': people,
+                'next_page': next_page
+            })
         else:
             return self.error_response(404)
 

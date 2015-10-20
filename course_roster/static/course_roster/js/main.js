@@ -3,7 +3,10 @@
 (function ($) {
     "use strict";
 
-    var photo_template;
+    var photo_template,
+        next_page,
+        filter_search_term,
+        filter_section_id;
 
     function loading_people(xhr) {
         $("span.loading").show();
@@ -15,6 +18,7 @@
     }
 
     function show_person() {
+        // TODO: check the value of filter_section_id
         $(this).closest('div.person-container').show();
         load_next_photo();
     }
@@ -27,10 +31,14 @@
                        .attr("src", el.attr("data-photo"));
         } else {
             $("span.loading").hide();
+            if (next_page) {
+                load_course_people(window.course_roster.canvas_course_id);
+            }
         }
     }
 
     function draw_people(data) {
+        next_page = data.next_page;
         $("#thumbnail-grid").append(photo_template(data));
         load_next_photo();
     }
@@ -40,11 +48,21 @@
         $("#thumbnail-grid").append("No photos");
     }
 
-    function load_course_people(course_id, filter_params) {
-        var url = "api/v1/course/" + course_id + "/people";
-        if (filter_params !== undefined && !$.isEmptyObject(filter_params)) {
-            url += "?" + $.param(filter_params);
+    function load_course_people(course_id) {
+        var url = "api/v1/course/" + course_id + "/people",
+            filter_params = {};
+
+        if (next_page) {
+            filter_params.page = next_page;
+        }
+
+        if (filter_search_term) {
+            filter_params.search_term = filter_search_term;
             $("#thumbnail-grid").empty();
+        }
+
+        if (!$.isEmptyObject(filter_params)) {
+            url += "?" + $.param(filter_params);
         }
 
         $.ajax({
@@ -58,9 +76,13 @@
     }
 
     function filter_by_section() {
-        var course_id = window.course_roster.canvas_course_id,
-            section_id = $(this).val();
-        load_course_people(course_id, {'canvas_section_id': section_id});
+        filter_section_id = $(this).val();
+
+        $(".person-container").show();
+        if (filter_section_id) {
+            $(".person-container:not([data-sections*='" + filter_section_id + "'])")
+                .hide();
+        }
     }
 
     function filter_by_search() {
@@ -69,7 +91,10 @@
 
         if (search_term.length === 0 || search_term.length > 2) {
             $(this).val(search_term);
-            load_course_people(course_id, {'search_term': search_term});
+            filter_search_term = search_term;
+            load_course_people(course_id);
+        } else {
+            filter_search_term = null;
         }
     }
 
@@ -99,9 +124,9 @@
         var course_id = window.course_roster.canvas_course_id;
 
         photo_template = Handlebars.compile($("#thumbnail-grid-tmpl").html());
+        $("#search-filter").keyup(filter_by_search);
         load_course_sections(course_id);
         load_course_people(course_id);
-        $("#search-filter").keyup(filter_by_search);
     }
 
     $(document).ready(initialize);

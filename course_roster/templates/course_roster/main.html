@@ -19,7 +19,7 @@
 {% load templatetag_handlebars %}
 {% tplhandlebars "section-filter-tmpl" %}
 <label class="control-label text-right col-sm-2" for="course-section-selector">Section</label>
-<div class="col-sm-10">
+<div class="col-sm-6">
     <select id="course-section-selector" class="form-control">
         <option value="">All Sections</option>{{# each sections}}
         <option value="{{id}}">{{name}}</option>{{/each}}
@@ -29,8 +29,8 @@
 
 {% tplhandlebars "thumbnail-grid-tmpl" %}
 {{# each people}}
-<div class="person-container col-sm-2 col-xs-3" style="margin-bottom: 30px; display: none;" data-sections="{{# each sections}}{{this}}:{{/each}}">
-    <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}"></a>
+<div class="person-container hidden col-sm-2 col-xs-3" data-sections="{{# each sections}}{{this}}:{{/each}}" data-names="{{search_name}}">
+    <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a>
     <div class="person-name" style="white-space: nowrap;"><a href="{{user_url}}" target="_top">{{name}}</a></div>
 </div>
 {{/each}}

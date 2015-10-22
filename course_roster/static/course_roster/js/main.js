@@ -13,20 +13,35 @@
         xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
     }
 
-    function load_dummy() {
-        $(this).attr("src", window.course_roster.nophoto_url);
+    function load_avatar() {
+        var avatar_url = $(this).closest('a.person-photo').attr('data-avatar');
+        if (!avatar_url.length) { // || avatar_url.match(/avatar-50\.png$/i)) {
+            avatar_url = window.course_roster.nophoto_url;
+        }
+        $(this).attr('src', avatar_url);
     }
 
     function show_person() {
-        // TODO: check the value of filter_section_id
-        $(this).closest('div.person-container').show();
+        if (filter_section_id &&
+                $(this).attr('data-sections').indexOf(filter_section_id) === -1) {
+            $(this).addClass('hidden');
+        } else if (filter_search_term &&
+                $(this).attr('data-names').indexOf(filter_search_term) === -1) {
+            $(this).addClass('hidden');
+        } else {
+            $(this).removeClass('hidden');
+        }
+    }
+
+    function image_loaded() {
+        show_person.call($(this).closest('div.person-container'));
         load_next_photo();
     }
 
     function load_next_photo() {
         var el = $("a.person-photo:empty").first();
         if (el.length === 1) {
-            $("<img/>").load(show_person).error(load_dummy)
+            $("<img/>").load(image_loaded).error(load_avatar)
                        .appendTo(el).addClass("roster-thumbnail img-responsive")
                        .attr("src", el.attr("data-photo"));
         } else {
@@ -49,20 +64,9 @@
     }
 
     function load_course_people(course_id) {
-        var url = "api/v1/course/" + course_id + "/people",
-            filter_params = {};
-
+        var url = "api/v1/course/" + course_id + "/people";
         if (next_page) {
-            filter_params.page = next_page;
-        }
-
-        if (filter_search_term) {
-            filter_params.search_term = filter_search_term;
-            $("#thumbnail-grid").empty();
-        }
-
-        if (!$.isEmptyObject(filter_params)) {
-            url += "?" + $.param(filter_params);
+            url += "?page=" + next_page;
         }
 
         $.ajax({
@@ -76,30 +80,22 @@
     }
 
     function filter_by_section() {
-        filter_section_id = $(this).val();
+        var section_id = $(this).val();
 
-        $(".person-container").show();
-        if (filter_section_id) {
-            $(".person-container:not([data-sections*='" + filter_section_id + "'])")
-                .hide();
-        }
+        filter_section_id = (section_id.length) ? section_id : null;
+        $('.person-container').each(show_person);
     }
 
     function filter_by_search() {
-        var course_id = window.course_roster.canvas_course_id,
-            search_term = $.trim($(this).val());
+        var search_term = $.trim($(this).val());
+        $(this).val(search_term);
 
-        if (search_term.length === 0 || search_term.length > 2) {
-            $(this).val(search_term);
-            filter_search_term = search_term;
-            load_course_people(course_id);
-        } else {
-            filter_search_term = null;
-        }
+        filter_search_term = (search_term.length > 0) ? search_term.toLowerCase() : null;
+        $('.person-container').each(show_person);
     }
 
     function loading_sections(xhr) {
-        xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
+        xhr.setRequestHeader('X-SessionId', window.course_roster.session_id);
     }
 
     function draw_section_selector(data) {

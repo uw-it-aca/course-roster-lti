@@ -7,7 +7,6 @@
     <meta name="HandheldFriendly" content="true">
     {% load staticfiles %}
     {% load compress %}
-
     <link rel="stylesheet" type="text/css" href="{% static 'course_roster/vendor/css/bootstrap-3.3.1.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'course_roster/vendor/css/font-awesome-4.4.0.min.css' %}"/>
     {% compress css %}
@@ -34,7 +33,7 @@
         window.course_roster = {
             session_id: '{{ session_id }}',
             canvas_course_id: '{{ canvas_course_id }}',
-            nophoto_url: '{{ nophoto_url }}'
+            nophoto_url: '{{ nophoto_url|safe }}'
         };
     </script>
 </body>

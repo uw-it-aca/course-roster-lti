@@ -4,7 +4,6 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
@@ -12,12 +11,14 @@ from restclients.canvas.users import Users
 from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
 from course_roster.models import IDPhoto
-from urlparse import urlparse, parse_qs
+from urlparse import urlparse, urlunparse, parse_qs
+from urllib import urlencode
 import logging
 
 
 logger = logging.getLogger(__name__)
-NOPHOTO_URL = static('course_roster/img/nophoto.jpg')
+NOPHOTO_URL = getattr(settings, 'ROSTER_NOPHOTO_URL',
+    'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=120&d=mm&f=y')
 
 
 @csrf_exempt
@@ -66,8 +67,6 @@ class CourseRoster(RESTDispatch):
     @transaction.atomic
     def GET(self, request, **kwargs):
         course_id = kwargs.get('canvas_course_id', None)
-        section_id = request.GET.get('canvas_section_id', None)
-        search_term = request.GET.get('search_term', None)
         page = request.GET.get('page', 1)
 
         if not course_id:
@@ -76,11 +75,8 @@ class CourseRoster(RESTDispatch):
         search_params = {
             'page': page,
             'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
-            'include': ['enrollments'],
+            'include': ['enrollments', 'avatar_url'],
         }
-
-        if search_term is not None and len(search_term):
-            search_params['search_term'] = search_term
 
         canvas = Users()
         try:
@@ -94,18 +90,23 @@ class CourseRoster(RESTDispatch):
             try:
                 policy.valid_reg_id(user.sis_user_id)
                 photo_url = IDPhoto(reg_id=user.sis_user_id).get_url()
+                avatar_url = self._avatar_url(user.avatar_url)
             except UserPolicyException:
                 try:
                     policy.valid_gmail_id(user.login_id)
-                    photo_url = NOPHOTO_URL
+                    photo_url = self._avatar_url(user.avatar_url)
+                    avatar_url = NOPHOTO_URL
                 except UserPolicyException:
                     continue
 
             people.append({
                 'user_url': user.enrollments[0].html_url,
                 'photo_url': photo_url,
+                'avatar_url': avatar_url,
                 'login_id': user.login_id,
                 'name': user.name,
+                'search_name': '%s %s' % (user.name.lower(),
+                                          user.login_id.lower()),
                 'sections': [e.section_id for e in user.enrollments],
             })
 
@@ -122,6 +123,13 @@ class CourseRoster(RESTDispatch):
             })
         else:
             return self.error_response(404)
+
+    def _avatar_url(self, url):
+        url_parts = urlparse(url)
+        if 'gravatar.com' in url_parts.netloc:
+            new_parts = url_parts._replace(query=urlencode({'s': 120, 'd': 'mm'}))
+            return urlunparse(new_parts)
+        return url 
 
 
 class CourseSections(RESTDispatch):

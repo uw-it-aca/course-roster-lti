@@ -30,6 +30,7 @@
             $(this).addClass('hidden');
         } else {
             $(this).removeClass('hidden');
+            $('#filter-none').addClass('hidden');
         }
     }
 
@@ -60,7 +61,6 @@
 
     function draw_error(xhr) {
         $("span.loading").hide();
-        $("#thumbnail-grid").append("No photos");
     }
 
     function load_course_people(course_id) {
@@ -79,19 +79,24 @@
         });
     }
 
+    function filter_people() {
+        $('.person-container').each(show_person);
+        if ($('.person-container').children(':visible').length === 0) {
+            $('#filter-none').removeClass('hidden');
+        }
+    }
+
     function filter_by_section() {
         var section_id = $(this).val();
-
         filter_section_id = (section_id.length) ? section_id : null;
-        $('.person-container').each(show_person);
+        filter_people();
     }
 
     function filter_by_search() {
         var search_term = $.trim($(this).val());
         $(this).val(search_term);
-
         filter_search_term = (search_term.length > 0) ? search_term.toLowerCase() : null;
-        $('.person-container').each(show_person);
+        filter_people();
     }
 
     function loading_sections(xhr) {

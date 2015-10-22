@@ -17,7 +17,7 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-NOPHOTO_URL = getattr(settings, 'ROSTER_NOPHOTO_URL',
+NOPHOTO_URL = getattr(settings, 'COURSE_ROSTER_NOPHOTO_URL',
     'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=120&d=mm&f=y')
 
 

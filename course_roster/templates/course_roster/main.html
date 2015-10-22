@@ -4,15 +4,13 @@
 <div class="course-roster-container">
     <h2 id="course-roster-header">Who's Who in {{course_name}}</h2>
 
-    <div class="form-group row">
-        <input type="text" id="search-filter" aria-label="Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input." placeholder="Search people" name="search_term"/>
-
-        <div id="section-filter"></div>
+    <div id="filter-container" class="form-inline">
+        <input type="text" id="search-filter" class="form-control" aria-label="Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input." placeholder="Search people" name="search_term"/>
     </div>
 
     <div class="container-fluid">
         <div id="thumbnail-grid" class="row"></div>
-        <span class="loading"><i class="fa fa-spinner fa-spin"></i></span>
+        <div class="loading"><i class="fa fa-spinner fa-pulse fa-2x"></i></div>
         <div id="filter-none" class="alert alert-info hidden">
             <p class="lead">No people found</p>
             <p>You can search by name or login.</p>
@@ -22,20 +20,17 @@
 
 {% load templatetag_handlebars %}
 {% tplhandlebars "section-filter-tmpl" %}
-<label class="control-label text-right col-sm-2" for="course-section-selector">Section</label>
-<div class="col-sm-6">
-    <select id="course-section-selector" class="form-control">
-        <option value="">All Sections</option>{{# each sections}}
-        <option value="{{id}}">{{name}}</option>{{/each}}
-    </select>
-</div>
+<select id="section-filter" aria-label="Limit search to section" name="section" class="form-control">
+    <option value="">All Sections</option>{{# each sections}}
+    <option value="{{id}}">{{name}}</option>{{/each}}
+</select>
 {% endtplhandlebars %}
 
 {% tplhandlebars "thumbnail-grid-tmpl" %}
 {{# each people}}
 <div class="person-container hidden col-sm-2 col-xs-3" data-sections="{{# each sections}}{{this}}:{{/each}}" data-names="{{search_name}}">
-    <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a>
-    <div class="person-name" style="white-space: nowrap;"><a href="{{user_url}}" target="_top">{{name}}</a></div>
+    <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a><br/>
+    <a href="{{user_url}}" target="_top">{{name}}<br/>{{login_id}}</a>
 </div>
 {{/each}}
 {% endtplhandlebars %}

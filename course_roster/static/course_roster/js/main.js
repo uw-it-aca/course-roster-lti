@@ -9,7 +9,7 @@
         filter_section_id;
 
     function loading_people(xhr) {
-        $("span.loading").show();
+        $(".loading").show();
         xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
     }
 
@@ -43,10 +43,9 @@
         var el = $("a.person-photo:empty").first();
         if (el.length === 1) {
             $("<img/>").load(image_loaded).error(load_avatar)
-                       .appendTo(el).addClass("roster-thumbnail img-responsive")
-                       .attr("src", el.attr("data-photo"));
+                       .appendTo(el).attr("src", el.attr("data-photo"));
         } else {
-            $("span.loading").hide();
+            $(".loading").hide();
             if (next_page) {
                 load_course_people(window.course_roster.canvas_course_id);
             }
@@ -60,7 +59,7 @@
     }
 
     function draw_error(xhr) {
-        $("span.loading").hide();
+        $(".loading").hide();
     }
 
     function load_course_people(course_id) {
@@ -106,8 +105,8 @@
     function draw_section_selector(data) {
         var template = Handlebars.compile($("#section-filter-tmpl").html());
         if (data.sections.length > 1) {
-            $("#section-filter").html(template(data));
-            $("#course-section-selector").change(filter_by_section);
+            $("#filter-container").append(template(data));
+            $("#section-filter").change(filter_by_section);
         }
     }
 

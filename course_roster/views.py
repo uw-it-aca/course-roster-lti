@@ -99,14 +99,14 @@ class CourseRoster(RESTDispatch):
                 except UserPolicyException:
                     continue
 
+            search_name = '%s %s' % (user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
                 'photo_url': photo_url,
                 'avatar_url': avatar_url,
                 'login_id': user.login_id,
                 'name': user.name,
-                'search_name': '%s %s' % (user.name.lower(),
-                                          user.login_id.lower()),
+                'search_name': search_name.lower(),
                 'sections': [e.section_id for e in user.enrollments],
             })
 
@@ -127,9 +127,11 @@ class CourseRoster(RESTDispatch):
     def _avatar_url(self, url):
         url_parts = urlparse(url)
         if 'gravatar.com' in url_parts.netloc:
-            new_parts = url_parts._replace(query=urlencode({'s': 120, 'd': 'mm'}))
+            new_parts = url_parts._replace(
+                query=urlencode({'s': 120, 'd': 'mm'})
+            )
             return urlunparse(new_parts)
-        return url 
+        return url
 
 
 class CourseSections(RESTDispatch):

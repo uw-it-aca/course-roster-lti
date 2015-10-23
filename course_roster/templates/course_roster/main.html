@@ -30,7 +30,7 @@
 {{# each people}}
 <div class="person-container hidden col-sm-2 col-xs-3" data-sections="{{# each sections}}{{this}}:{{/each}}" data-names="{{search_name}}">
     <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a><br/>
-    <a href="{{user_url}}" target="_top">{{name}}<br/>{{login_id}}</a>
+    <a href="{{user_url}}" target="_top"><strong>{{name}}</strong><br/>{{login_id}}</a>
 </div>
 {{/each}}
 {% endtplhandlebars %}

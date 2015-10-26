@@ -27,7 +27,7 @@ def Main(request, template='course_roster/main.html'):
     status_code = 200
     try:
         blti = BLTI()
-        blti_data = blti.validate(request)
+        blti_data = blti.validate(request, visibility=BLTI.ADMIN)
         canvas_login_id = blti_data.get('custom_canvas_user_login_id', None)
         canvas_sis_user_id = blti_data.get('lis_person_sourcedid', None)
         canvas_course_id = blti_data.get('custom_canvas_course_id', None)
@@ -41,10 +41,14 @@ def Main(request, template='course_roster/main.html'):
         params['course_name'] = blti_data.get('context_label', 'this course')
         params['nophoto_url'] = NOPHOTO_URL
         params['session_id'] = request.session.session_key
+    except BLTIException as err:
+        status_code = 401
+        template = 'blti/401.html'
+        params['validation_error'] = err
     except Exception as err:
+        status_code = 500
         template = 'blti/error.html'
         params['validation_error'] = err
-        status_code = 401
 
     t = loader.get_template(template)
     c = Context(params)

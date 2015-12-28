@@ -79,6 +79,7 @@ class CourseRoster(RESTDispatch):
         search_params = {
             'page': page,
             'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
+            'enrollment_type': ['student'],
             'include': ['enrollments', 'avatar_url'],
         }
 

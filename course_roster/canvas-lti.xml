@@ -9,14 +9,14 @@
     http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd
     http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
     <blti:launch_url>https://example.edu/roster/</blti:launch_url>
-    <blti:title>Course Roster</blti:title>
-    <blti:description>Displays a course roster</blti:description>
+    <blti:title>View Student Photos</blti:title>
+    <blti:description>Displays a course roster containing student photos</blti:description>
     <blti:custom>
       <lticm:property name="courseid_parameter">lis_course_offering_sourcedid</lticm:property>
       <lticm:property name="userid_parameter">lis_person_sourcedid</lticm:property>
       <lticm:property name="custom_canvas_account_id">$Canvas.account.id</lticm:property>
       <lticm:property name="custom_canvas_account_sis_id">$Canvas.account.sisSourceId</lticm:property>
-      <lticm:property name="application_type">Course Roster</lticm:property>
+      <lticm:property name="application_type">View Student Photos</lticm:property>
     </blti:custom>
     <blti:extensions platform="canvas.instructure.com">
       <lticm:property name="privacy_level">public</lticm:property>

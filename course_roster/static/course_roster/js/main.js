@@ -5,18 +5,21 @@
 
     var photo_template,
         next_page,
+        image_size = '120',
+        nophoto_url = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=' +
+            image_size + '&d=mm&f=y',
         filter_search_term,
         filter_section_id;
 
     function loading_people(xhr) {
-        $(".loading").show();
-        xhr.setRequestHeader("X-SessionId", window.course_roster.session_id);
+        $('.loading').show();
+        xhr.setRequestHeader('X-SessionId', window.course_roster.session_id);
     }
 
     function load_avatar() {
         var avatar_url = $(this).closest('a.person-photo').attr('data-avatar');
-        if (!avatar_url.length) { // || avatar_url.match(/avatar-50\.png$/i)) {
-            avatar_url = window.course_roster.nophoto_url;
+        if (!avatar_url.length) {
+            avatar_url = nophoto_url;
         }
         $(this).attr('src', avatar_url);
     }
@@ -40,12 +43,12 @@
     }
 
     function load_next_photo() {
-        var el = $("a.person-photo:empty").first();
+        var el = $('a.person-photo:empty').first();
         if (el.length === 1) {
-            $("<img/>").load(image_loaded).error(load_avatar)
-                       .appendTo(el).attr("src", el.attr("data-photo"));
+            $('<img/>').load(image_loaded).error(load_avatar)
+                       .appendTo(el).attr('src', el.attr('data-photo'));
         } else {
-            $(".loading").hide();
+            $('.loading').hide();
             if (next_page) {
                 load_course_people(window.course_roster.canvas_course_id);
             }
@@ -54,18 +57,20 @@
 
     function draw_people(data) {
         next_page = data.next_page;
-        $("#thumbnail-grid").append(photo_template(data));
+        $('#thumbnail-grid').append(photo_template(data));
         load_next_photo();
     }
 
     function draw_error(xhr) {
-        $(".loading").hide();
+        $('.loading').hide();
     }
 
     function load_course_people(course_id) {
-        var url = "api/v1/course/" + course_id + "/people";
+        var url = "api/v1/course/" + course_id +
+            "/people?image_size=" + image_size;
+
         if (next_page) {
-            url += "?page=" + next_page;
+            url += "&page=" + next_page;
         }
 
         $.ajax({
@@ -79,10 +84,14 @@
     }
 
     function filter_people() {
-        $('.person-container').each(show_person);
-        if ($('.person-container').children(':visible').length === 0) {
-            $('#filter-none').removeClass('hidden');
-        }
+        $('#filtering').removeClass('hidden');
+        setTimeout(function () {
+            $('.person-container').each(show_person);
+            $('#filtering').addClass('hidden');
+            if ($('.person-container').children(':visible').length === 0) {
+                $('#filter-none').removeClass('hidden');
+            }
+        }, 500);
     }
 
     function filter_by_section() {
@@ -103,10 +112,10 @@
     }
 
     function draw_section_selector(data) {
-        var template = Handlebars.compile($("#section-filter-tmpl").html());
+        var template = Handlebars.compile($('#section-filter-tmpl').html());
         if (data.sections.length > 1) {
-            $("#filter-container").append(template(data));
-            $("#section-filter").change(filter_by_section);
+            $('#search-filter').after(template(data));
+            $('#section-filter').change(filter_by_section);
         }
     }
 

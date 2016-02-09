@@ -5,6 +5,9 @@
 
     var photo_template,
         next_page,
+        image_size = '120',
+        nophoto_url = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=' +
+            image_size + '&d=mm&f=y',
         filter_search_term,
         filter_section_id;
 
@@ -16,7 +19,7 @@
     function load_avatar() {
         var avatar_url = $(this).closest('a.person-photo').attr('data-avatar');
         if (!avatar_url.length) {
-            avatar_url = window.course_roster.nophoto_url;
+            avatar_url = nophoto_url;
         }
         $(this).attr('src', avatar_url);
     }
@@ -63,9 +66,11 @@
     }
 
     function load_course_people(course_id) {
-        var url = "api/v1/course/" + course_id + "/people";
+        var url = "api/v1/course/" + course_id +
+            "/people?image_size=" + image_size;
+
         if (next_page) {
-            url += "?page=" + next_page;
+            url += "&page=" + next_page;
         }
 
         $.ajax({

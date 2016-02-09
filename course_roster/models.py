@@ -9,11 +9,12 @@ class IDPhoto(models.Model):
     """
     url_key = models.CharField(max_length=16, unique=True)
     reg_id = models.CharField(max_length=32)
+    image_size = models.IntegerField(max_length=3)
     date_created = models.DateTimeField(auto_now=True)
 
     def get(self):
         self.delete()
-        return PWS().get_idcard_photo(self.reg_id, size=120)
+        return PWS().get_idcard_photo(self.reg_id, size=self.image_size)
 
     def get_url(self):
         """ Returns a url for the IDPhoto

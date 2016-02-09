@@ -17,8 +17,6 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-NOPHOTO_URL = getattr(settings, 'COURSE_ROSTER_NOPHOTO_URL',
-    'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=120&d=mm&f=y')
 
 
 @csrf_exempt
@@ -39,7 +37,6 @@ def Main(request, template='course_roster/main.html'):
 
         params['canvas_course_id'] = canvas_course_id
         params['course_name'] = blti_data.get('context_label', 'this course')
-        params['nophoto_url'] = NOPHOTO_URL
         params['session_id'] = request.session.session_key
     except BLTIException as err:
         status_code = 401
@@ -71,6 +68,7 @@ class CourseRoster(RESTDispatch):
     @transaction.atomic
     def GET(self, request, **kwargs):
         course_id = kwargs.get('canvas_course_id', None)
+        image_size = request.GET.get('image_size', 120)
         page = request.GET.get('page', 1)
 
         if not course_id:
@@ -94,13 +92,14 @@ class CourseRoster(RESTDispatch):
         for user in users:
             try:
                 policy.valid_reg_id(user.sis_user_id)
-                photo_url = IDPhoto(reg_id=user.sis_user_id).get_url()
-                avatar_url = self._avatar_url(user.avatar_url)
+                photo_url = IDPhoto(reg_id=user.sis_user_id,
+                                    image_size=image_size).get_url()
+                avatar_url = self._avatar_url(user.avatar_url, image_size)
             except UserPolicyException:
                 try:
                     policy.valid_gmail_id(user.login_id)
-                    photo_url = self._avatar_url(user.avatar_url)
-                    avatar_url = NOPHOTO_URL
+                    photo_url = self._avatar_url(user.avatar_url, image_size)
+                    avatar_url = ''
                 except UserPolicyException:
                     continue
 
@@ -129,11 +128,11 @@ class CourseRoster(RESTDispatch):
         else:
             return self.error_response(404)
 
-    def _avatar_url(self, url):
+    def _avatar_url(self, url, image_size):
         url_parts = urlparse(url)
         if 'gravatar.com' in url_parts.netloc:
             new_parts = url_parts._replace(
-                query=urlencode({'s': 120, 'd': 'mm'})
+                query=urlencode({'s': image_size, 'd': 'mm'})
             )
             return urlunparse(new_parts)
         return url

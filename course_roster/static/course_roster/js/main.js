@@ -3,6 +3,10 @@
 (function ($) {
     "use strict";
 
+    Handlebars.registerHelper('nonbreaking', function(text) {
+        return text.replace(/ /g, '\u00a0');
+    });
+
     var photo_template,
         next_page,
         image_size = '120',

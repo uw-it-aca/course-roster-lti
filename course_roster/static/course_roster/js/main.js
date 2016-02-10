@@ -24,6 +24,12 @@
         $(this).attr('src', avatar_url);
     }
 
+    function update_visible_count() {
+        var count = $('.person-container').filter(':visible').length;
+        $('#filter-count span').text(count);
+        return count;
+    }
+
     function show_person() {
         if (filter_section_id &&
                 $(this).attr('data-sections').indexOf(filter_section_id) === -1) {
@@ -33,7 +39,6 @@
             $(this).addClass('hidden');
         } else {
             $(this).removeClass('hidden');
-            $('#filter-none').addClass('hidden');
         }
     }
 
@@ -53,6 +58,7 @@
                 load_course_people(window.course_roster.canvas_course_id);
             }
         }
+        update_visible_count();
     }
 
     function draw_people(data) {
@@ -88,8 +94,10 @@
         setTimeout(function () {
             $('.person-container').each(show_person);
             $('#filtering').addClass('hidden');
-            if ($('.person-container').children(':visible').length === 0) {
+            if (update_visible_count() === 0) {
                 $('#filter-none').removeClass('hidden');
+            } else {
+                $('#filter-none').addClass('hidden');
             }
         }, 500);
     }

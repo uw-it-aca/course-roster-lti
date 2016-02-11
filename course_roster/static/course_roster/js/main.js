@@ -3,15 +3,15 @@
 (function ($) {
     "use strict";
 
-    Handlebars.registerHelper('nonbreaking', function(text) {
+    Handlebars.registerHelper('nonbreaking', function (text) {
         return text.replace(/ /g, '\u00a0');
     });
 
     var photo_template,
         next_page,
         image_size = '120',
-        nophoto_url = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?s=' +
-            image_size + '&d=mm&f=y',
+        nophoto_url = 'https://www.gravatar.com/avatar/' +
+            '00000000000000000000000000000000?s=' + image_size + '&d=mm&f=y',
         filter_search_term,
         filter_section_id;
 
@@ -29,8 +29,10 @@
     }
 
     function update_visible_count() {
-        var count = $('.person-container').filter(':visible').length;
-        $('#filter-count span').text(count);
+        var count = $('.person-container').filter(':visible').length,
+            text = 'Showing ' + count +
+                ((count === 1) ? ' student' : ' students');
+        $('#filter-count').text(text);
         return count;
     }
 
@@ -42,6 +44,11 @@
                 $(this).attr('data-names').indexOf(filter_search_term) === -1) {
             $(this).addClass('hidden');
         } else {
+            $(this).find('span.name,span.login-id').removeHighlight();
+            if (filter_search_term) {
+                $(this).find('span.name,span.login-id')
+                       .highlight(filter_search_term);
+            }
             $(this).removeClass('hidden');
         }
     }

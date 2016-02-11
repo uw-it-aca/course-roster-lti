@@ -1,3 +1,6 @@
+@canvas-light-background-alert: #fef6e6;
+@highlight-color: darken(@canvas-light-background-alert, 15%); 
+
 // mobile first styles
 body { background: none; font: 13px/1.5 "Helvetica Neue",Arial,"Liberation Sans",FreeSans,sans-serif; }
 .container { margin: 0; }
@@ -21,8 +24,8 @@ body { background: none; font: 13px/1.5 "Helvetica Neue",Arial,"Liberation Sans"
     }
 
     .person-container { text-align: center; margin-bottom: 30px; white-space: nowrap; overflow: hidden;
-        a { color: #555; }
-        a:hover { color: #0081bd; text-decoration: none; }
+        a { color: #444; }
+        a:hover { color: #00567e; text-decoration: none; }
         .person-photo {
             img { height: 120px; margin-bottom: 6px; }
     }
@@ -31,7 +34,7 @@ body { background: none; font: 13px/1.5 "Helvetica Neue",Arial,"Liberation Sans"
             span.name { font-weight: bold; max-height: 30px; text-overflow: ellipsis; display: block; overflow: hidden; }
             span.login-id { margin-top: 3px; display: block; }
             }
-            .highlight { background-color: yellow; }
+            .highlight { background-color: @highlight-color; font-weight: bold; }
         }
 
     .loading { text-align: center; }

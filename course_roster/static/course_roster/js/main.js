@@ -33,7 +33,6 @@
             text = 'Showing ' + count +
                 ((count === 1) ? ' student' : ' students');
         $('#filter-count').text(text);
-        return count;
     }
 
     function show_person() {
@@ -69,7 +68,6 @@
                 load_course_people(window.course_roster.canvas_course_id);
             }
         }
-        update_visible_count();
     }
 
     function draw_people(data) {
@@ -105,7 +103,7 @@
         setTimeout(function () {
             $('.person-container').each(show_person);
             $('#filtering').addClass('hidden');
-            if (update_visible_count() === 0) {
+            if ($('.person-container').filter(':visible').length === 0) {
                 $('#filter-none').removeClass('hidden');
             } else {
                 $('#filter-none').addClass('hidden');

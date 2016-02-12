@@ -7,6 +7,7 @@ from django.core.context_processors import csrf
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
+from restclients.canvas.enrollments import Enrollments
 from restclients.canvas.users import Users
 from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
@@ -27,11 +28,13 @@ def Main(request, template='course_roster/main.html'):
         blti = BLTI()
         blti_data = blti.validate(request, visibility=BLTI.ADMIN)
         canvas_login_id = blti_data.get('custom_canvas_user_login_id', None)
+        canvas_user_id = blti_data.get('custom_canvas_user_id', None)
         canvas_sis_user_id = blti_data.get('lis_person_sourcedid', None)
         canvas_course_id = blti_data.get('custom_canvas_course_id', None)
 
         blti.set_session(request,
-                         user_id=canvas_login_id,
+                         login_id=canvas_login_id,
+                         user_id=canvas_user_id,
                          sis_user_id=canvas_sis_user_id,
                          canvas_course_id=canvas_course_id)
 
@@ -74,16 +77,21 @@ class CourseRoster(RESTDispatch):
         if not course_id:
             return self.error_response(400, 'Missing course ID')
 
-        search_params = {
+        try:
+            user_id = BLTI().get_session(request).get('user_id')
+        except BLTIException as err:
+            return self.error_response(401, err)
+
+        params = {
             'page': page,
-            'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 30),
+            'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 50),
             'enrollment_type': ['student'],
-            'include': ['enrollments', 'avatar_url'],
+            'include': ['enrollments', 'avatar_url']
         }
 
-        canvas = Users()
+        canvas = Users(as_user=user_id)
         try:
-            users = canvas.get_users_for_course(course_id, search_params)
+            users = canvas.get_users_for_course(course_id, params)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
@@ -144,13 +152,30 @@ class CourseSections(RESTDispatch):
     """
     def GET(self, request, **kwargs):
         course_id = kwargs['canvas_course_id']
-        sections = []
 
         try:
-            for section in Sections().get_sections_in_course(course_id):
+            user_id = BLTI().get_session(request).get('user_id')
+        except BLTIException as err:
+            return self.error_response(401, err)
+
+        sections = []
+        try:
+            limit_privileges_to_course_section = False
+            limit_sections = {}
+            for enrollment in Enrollments().get_enrollments_for_course(
+                    course_id, {'user_id': user_id}):
+                if enrollment.limit_privileges_to_course_section:
+                    limit_privileges_to_course_section = True
+                    limit_sections[enrollment.section_id] = True
+
+            for section in Sections(as_user=user_id).get_sections_in_course(
+                    course_id):
+                if (limit_privileges_to_course_section and
+                        section.section_id not in limit_sections):
+                    continue
+
                 sections.append({
                     'id': section.section_id,
-                    'sis_id': section.sis_section_id,
                     'name': section.name
                 })
         except DataFailureException as err:

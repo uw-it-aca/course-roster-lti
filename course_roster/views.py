@@ -4,6 +4,7 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.template import Context, loader
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
+from django.utils.timezone import utc
 from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
@@ -12,6 +13,7 @@ from restclients.canvas.users import Users
 from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
 from course_roster.models import IDPhoto
+from datetime import datetime, timedelta
 from urlparse import urlparse, urlunparse, parse_qs
 from urllib import urlencode
 import logging
@@ -57,10 +59,17 @@ def Main(request, template='course_roster/main.html'):
 
 
 def RosterPhoto(request, photo_key):
+    cache = 60 * 60 * 4
+    now = datetime.utcnow()
+    expires = now + timedelta(seconds=cache)
     try:
-        return StreamingHttpResponse(
+        response = StreamingHttpResponse(
             IDPhoto.objects.get(url_key=photo_key).get(),
             content_type='image/jpeg')
+        response['Cache-Control'] = 'public,max-age=%s' % cache
+        response['Expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response['Last-Modified'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        return response
     except DataFailureException as err:
         return HttpResponse(status=err.status)
     except IDPhoto.DoesNotExist:

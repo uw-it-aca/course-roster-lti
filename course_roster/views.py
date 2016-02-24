@@ -73,7 +73,8 @@ def RosterPhoto(request, photo_key):
     except DataFailureException as err:
         return HttpResponse(status=err.status)
     except IDPhoto.DoesNotExist:
-        return HttpResponse(status=404)
+        status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
+        return HttpResponse(status=status)
 
 
 class CourseRoster(RESTDispatch):

@@ -132,19 +132,16 @@ class CourseRoster(RESTDispatch):
                 'sections': [e.section_id for e in user.enrollments],
             })
 
-        if len(people):
-            try:
-                url_parts = urlparse(canvas.next_page_url)
-                next_page = parse_qs(url_parts.query).get('page', [])[0]
-            except Exception as err:
-                next_page = None
+        try:
+            url_parts = urlparse(canvas.next_page_url)
+            next_page = parse_qs(url_parts.query).get('page', [])[0]
+        except Exception as err:
+            next_page = None
 
-            return self.json_response({
-                'people': people,
-                'next_page': next_page
-            })
-        else:
-            return self.error_response(404)
+        return self.json_response({
+            'people': people,
+            'next_page': next_page
+        })
 
     def _avatar_url(self, url, image_size):
         url_parts = urlparse(url)

@@ -28,13 +28,6 @@
         $(this).attr('src', avatar_url);
     }
 
-    function update_visible_count() {
-        var count = $('.person-container').filter(':visible').length,
-            text = 'Showing ' + count +
-                ((count === 1) ? ' student' : ' students');
-        $('#filter-count').text(text);
-    }
-
     function show_person() {
         if (filter_section_id &&
                 $(this).attr('data-sections').indexOf(filter_section_id) === -1) {
@@ -74,6 +67,11 @@
         next_page = data.next_page;
         $('#thumbnail-grid').append(photo_template(data));
         load_next_photo();
+
+        if (next_page === null && $('.person-container').length === 0) {
+            $('#filter-none').removeClass('hidden')
+                             .find('p').text('No students in this course');
+        }
     }
 
     function draw_error(xhr) {

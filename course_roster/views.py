@@ -102,12 +102,12 @@ class CourseRoster(RESTDispatch):
         }
 
         @retry(SSLError, tries=3, delay=1, logger=logger)
-        def _get_users_for_course(course_id, user_id, params):
-            return Users(as_user=user_id).get_users_for_course(course_id,
-                                                               params)
+        def _get_users_for_course(canvas, course_id, params):
+            return canvas.get_users_for_course(course_id, params)
 
+        canvas = Users(as_user=user_id)
         try:
-            users = _get_users_for_course(course_id, user_id, params)
+            users = _get_users_for_course(canvas, course_id, params)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 

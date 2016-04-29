@@ -1,11 +1,8 @@
 from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, StreamingHttpResponse
-from django.template import Context, loader
-from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
 from django.utils.timezone import utc
-from blti import BLTI, BLTIException
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
 from restclients.canvas.enrollments import Enrollments
@@ -24,40 +21,21 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@csrf_exempt
-def Main(request, template='course_roster/main.html'):
-    params = {}
-    status_code = 200
-    try:
-        blti = BLTI()
-        blti_data = blti.validate(request, visibility=BLTI.ADMIN)
-        canvas_login_id = blti_data.get('custom_canvas_user_login_id', None)
-        canvas_user_id = blti_data.get('custom_canvas_user_id', None)
-        canvas_sis_user_id = blti_data.get('lis_person_sourcedid', None)
-        canvas_course_id = blti_data.get('custom_canvas_course_id', None)
+class LaunchView(BLTILaunchView):
+    template_name = 'course_roster/main.html'
+    authorized_role = 'admin'
 
-        blti.set_session(request,
-                         login_id=canvas_login_id,
-                         user_id=canvas_user_id,
-                         sis_user_id=canvas_sis_user_id,
-                         canvas_course_id=canvas_course_id)
+    def get_context_data(self, **kwargs):
+        request = kwargs.get('request')
+        blti_data = kwargs.get('blti_params')
 
-        params['canvas_course_id'] = canvas_course_id
-        params['course_name'] = blti_data.get('context_label', 'this course')
-        params['session_id'] = request.session.session_key
-    except BLTIException as err:
-        status_code = 401
-        template = 'blti/401.html'
-        params['validation_error'] = err
-    except Exception as err:
-        status_code = 500
-        template = 'blti/error.html'
-        params['validation_error'] = err
-
-    t = loader.get_template(template)
-    c = Context(params)
-    c.update(csrf(request))
-    return HttpResponse(t.render(c), status=status_code)
+        context = {
+            'session_id': request.session.session_key,
+            'canvas_course_id': blti_data.get('custom_canvas_course_id'),
+            'course_name': blti_data.get('context_label', 'this course')
+        }
+        context.update(csrf(request))
+        return context
 
 
 def RosterPhoto(request, photo_key):
@@ -90,8 +68,9 @@ class CourseRoster(RESTDispatch):
             return self.error_response(400, 'Missing course ID')
 
         try:
-            user_id = BLTI().get_session(request).get('user_id')
-        except BLTIException as err:
+            blti_data = self.get_session(request).get('blti_params')
+            user_id = blti_data.get('custom_canvas_user_login_id')
+        except Exception as err:
             return self.error_response(401, err)
 
         params = {
@@ -167,8 +146,9 @@ class CourseSections(RESTDispatch):
         course_id = kwargs['canvas_course_id']
 
         try:
-            user_id = BLTI().get_session(request).get('user_id')
-        except BLTIException as err:
+            blti_data = self.get_session(request).get('blti_params')
+            user_id = blti_data.get('custom_canvas_user_login_id')
+        except Exception as err:
             return self.error_response(401, err)
 
         @retry(SSLError, tries=3, delay=1, logger=logger)

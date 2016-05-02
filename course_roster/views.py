@@ -3,6 +3,8 @@ from django.db import transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.core.context_processors import csrf
 from django.utils.timezone import utc
+from django.views.generic import View
+from blti.views import BLTILaunchView
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.policy import UserPolicy, UserPolicyException
 from restclients.canvas.enrollments import Enrollments
@@ -38,23 +40,27 @@ class LaunchView(BLTILaunchView):
         return context
 
 
-def RosterPhoto(request, photo_key):
-    cache = 60 * 60 * 4
-    now = datetime.utcnow()
-    expires = now + timedelta(seconds=cache)
-    try:
-        response = StreamingHttpResponse(
-            IDPhoto.objects.get(url_key=photo_key).get(),
-            content_type='image/jpeg')
-        response['Cache-Control'] = 'public,max-age=%s' % cache
-        response['Expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response['Last-Modified'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        return response
-    except DataFailureException as err:
-        return HttpResponse(status=err.status)
-    except IDPhoto.DoesNotExist:
-        status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
-        return HttpResponse(status=status)
+class RosterPhoto(View):
+    cache_time = 60 * 60 * 4
+    date_format = '%a, %d %b %Y %H:%M:%S GMT'
+
+    def get(self, request, *args, **kwargs):
+        photo_key = kwargs.get('photo_key')
+        now = datetime.utcnow()
+        expires = now + timedelta(seconds=self.cache_time)
+        try:
+            response = StreamingHttpResponse(
+                IDPhoto.objects.get(url_key=photo_key).get(),
+                content_type='image/jpeg')
+            response['Cache-Control'] = 'public,max-age=%s' % self.cache_time
+            response['Expires'] = expires.strftime(self.date_format)
+            response['Last-Modified'] = now.strftime(self.date_format)
+            return response
+        except DataFailureException as err:
+            return HttpResponse(status=err.status)
+        except IDPhoto.DoesNotExist:
+            status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
+            return HttpResponse(status=status)
 
 
 class CourseRoster(RESTDispatch):
@@ -67,11 +73,8 @@ class CourseRoster(RESTDispatch):
         if not course_id:
             return self.error_response(400, 'Missing course ID')
 
-        try:
-            blti_data = self.get_session(request).get('blti_params')
-            user_id = blti_data.get('custom_canvas_user_login_id')
-        except Exception as err:
-            return self.error_response(401, err)
+        blti_data = self.get_session(request)
+        user_id = blti_data.get('custom_canvas_user_id')
 
         params = {
             'page': page,
@@ -144,12 +147,8 @@ class CourseSections(RESTDispatch):
     """
     def GET(self, request, **kwargs):
         course_id = kwargs['canvas_course_id']
-
-        try:
-            blti_data = self.get_session(request).get('blti_params')
-            user_id = blti_data.get('custom_canvas_user_login_id')
-        except Exception as err:
-            return self.error_response(401, err)
+        blti_data = self.get_session(request)
+        user_id = blti_data.get('custom_canvas_user_id')
 
         @retry(SSLError, tries=3, delay=1, logger=logger)
         def _get_enrollments_for_course(course_id, user_id):

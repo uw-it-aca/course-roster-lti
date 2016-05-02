@@ -45,7 +45,7 @@ class RosterPhoto(View):
     date_format = '%a, %d %b %Y %H:%M:%S GMT'
 
     def get(self, request, *args, **kwargs):
-        photo_key = args[0]
+        photo_key = kwargs.get('photo_key')
         now = datetime.utcnow()
         expires = now + timedelta(seconds=self.cache_time)
         try:

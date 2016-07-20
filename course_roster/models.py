@@ -9,7 +9,7 @@ class IDPhoto(models.Model):
     """
     url_key = models.CharField(max_length=16, unique=True)
     reg_id = models.CharField(max_length=32)
-    image_size = models.IntegerField(max_length=3)
+    image_size = models.IntegerField()
     date_created = models.DateTimeField(auto_now=True)
 
     def get(self):

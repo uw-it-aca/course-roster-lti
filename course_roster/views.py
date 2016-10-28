@@ -6,7 +6,8 @@ from django.utils.timezone import utc
 from django.views.generic import View
 from blti.views import BLTILaunchView
 from blti.views.rest_dispatch import RESTDispatch
-from sis_provisioner.policy import UserPolicy, UserPolicyException
+from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
+from sis_provisioner.exceptions import UserPolicyException
 from restclients.canvas.enrollments import Enrollments
 from restclients.canvas.users import Users
 from restclients.canvas.sections import Sections
@@ -94,16 +95,15 @@ class CourseRoster(RESTDispatch):
             return self.error_response(500, err.msg)
 
         people = []
-        policy = UserPolicy()
         for user in users:
             try:
-                policy.valid_reg_id(user.sis_user_id)
+                valid_reg_id(user.sis_user_id)
                 photo_url = IDPhoto(reg_id=user.sis_user_id,
                                     image_size=image_size).get_url()
                 avatar_url = self._avatar_url(user.avatar_url, image_size)
             except UserPolicyException:
                 try:
-                    policy.valid_gmail_id(user.login_id)
+                    valid_gmail_id(user.login_id)
                     photo_url = self._avatar_url(user.avatar_url, image_size)
                     avatar_url = ''
                 except UserPolicyException:

@@ -35,7 +35,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'templatetag_handlebars',
     'restclients',
     'userservice',
     'sis_provisioner',

@@ -21,6 +21,7 @@
     }
 
     function load_avatar() {
+        /*jshint validthis: true */
         var avatar_url = $(this).closest('a.person-photo').attr('data-avatar');
         if (!avatar_url.length) {
             avatar_url = nophoto_url;
@@ -29,6 +30,7 @@
     }
 
     function show_person() {
+        /*jshint validthis: true */
         if (filter_section_id &&
                 $(this).attr('data-sections').indexOf(filter_section_id) === -1) {
             $(this).addClass('hidden');
@@ -46,6 +48,7 @@
     }
 
     function image_loaded() {
+        /*jshint validthis: true */
         show_person.call($(this).closest('div.person-container'));
         load_next_photo();
     }
@@ -110,12 +113,14 @@
     }
 
     function filter_by_section() {
+        /*jshint validthis: true */
         var section_id = $(this).val();
         filter_section_id = (section_id.length) ? section_id : null;
         filter_people();
     }
 
     function filter_by_search() {
+        /*jshint validthis: true */
         var search_term = $.trim($(this).val());
         $(this).val(search_term);
         filter_search_term = (search_term.length > 0) ? search_term.toLowerCase() : null;

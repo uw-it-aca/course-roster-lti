@@ -1,0 +1,20 @@
+sudo: false
+language: python
+python:
+  - "2.7"
+before_install:
+  - cp travis-ci/test_requirements.txt requirements.txt
+install: pip install -r requirements.txt
+before_script:
+  - pip install coverage
+  - pip install python-coveralls
+  - pip install pep8
+  - npm install jshint
+  - cp travis-ci/manage.py manage.py
+script:
+  - pep8 course_roster/ --exclude=migrations
+  - jshint course_roster/static/course_roster/js/ --verbose
+  - coverage run --source=course_roster/ manage.py test course_roster
+after_script:
+  - coveralls
+notifications:

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.core.context_processors import csrf
@@ -8,20 +7,13 @@ from blti.views import BLTILaunchView
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
 from sis_provisioner.exceptions import UserPolicyException
-from restclients.canvas.enrollments import Enrollments
-from restclients.canvas.users import Users
-from restclients.canvas.sections import Sections
 from restclients.exceptions import DataFailureException
-from restclients.util.retry import retry
-from urllib3.exceptions import SSLError
+from course_roster.dao.canvas import (
+    get_users_for_course, get_enrollments_for_course, get_sections_in_course,
+    resize_avatar)
 from course_roster.models import IDPhoto
 from datetime import datetime, timedelta
-from urlparse import urlparse, urlunparse, parse_qs
-from urllib import urlencode
-import logging
-
-
-logger = logging.getLogger(__name__)
+from urlparse import urlparse, parse_qs
 
 
 class LaunchView(BLTILaunchView):
@@ -77,20 +69,8 @@ class CourseRoster(RESTDispatch):
         blti_data = self.get_session(request)
         user_id = blti_data.get('custom_canvas_user_id')
 
-        params = {
-            'page': page,
-            'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 50),
-            'enrollment_type': ['student'],
-            'include': ['enrollments', 'avatar_url']
-        }
-
-        @retry(SSLError, tries=3, delay=1, logger=logger)
-        def _get_users_for_course(canvas, course_id, params):
-            return canvas.get_users_for_course(course_id, params)
-
-        canvas = Users(as_user=user_id)
         try:
-            users = _get_users_for_course(canvas, course_id, params)
+            users = get_users_for_course(course_id, user_id, page)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
@@ -100,11 +80,11 @@ class CourseRoster(RESTDispatch):
                 valid_reg_id(user.sis_user_id)
                 photo_url = IDPhoto(reg_id=user.sis_user_id,
                                     image_size=image_size).get_url()
-                avatar_url = self._avatar_url(user.avatar_url, image_size)
+                avatar_url = resize_avatar(user.avatar_url, image_size)
             except UserPolicyException:
                 try:
                     valid_gmail_id(user.login_id)
-                    photo_url = self._avatar_url(user.avatar_url, image_size)
+                    photo_url = resize_avatar(user.avatar_url, image_size)
                     avatar_url = ''
                 except UserPolicyException:
                     continue
@@ -131,15 +111,6 @@ class CourseRoster(RESTDispatch):
             'next_page': next_page
         })
 
-    def _avatar_url(self, url, image_size):
-        url_parts = urlparse(url)
-        if 'gravatar.com' in url_parts.netloc:
-            new_parts = url_parts._replace(
-                query=urlencode({'s': image_size, 'd': 'mm'})
-            )
-            return urlunparse(new_parts)
-        return url
-
 
 class CourseSections(RESTDispatch):
     """ Performs actions on Canvas Course Sections
@@ -150,25 +121,16 @@ class CourseSections(RESTDispatch):
         blti_data = self.get_session(request)
         user_id = blti_data.get('custom_canvas_user_id')
 
-        @retry(SSLError, tries=3, delay=1, logger=logger)
-        def _get_enrollments_for_course(course_id, user_id):
-            return Enrollments().get_enrollments_for_course(
-                course_id, {'user_id': user_id})
-
-        @retry(SSLError, tries=3, delay=1, logger=logger)
-        def _get_sections_for_course(course_id, user_id):
-            return Sections(as_user=user_id).get_sections_in_course(course_id)
-
         sections = []
         try:
             limit_privileges_to_course_section = False
             limit_sections = {}
-            for enrollment in _get_enrollments_for_course(course_id, user_id):
+            for enrollment in get_enrollments_for_course(course_id, user_id):
                 if enrollment.limit_privileges_to_course_section:
                     limit_privileges_to_course_section = True
                     limit_sections[enrollment.section_id] = True
 
-            for section in _get_sections_for_course(course_id, user_id):
+            for section in get_sections_for_course(course_id, user_id):
                 if (limit_privileges_to_course_section and
                         section.section_id not in limit_sections):
                     continue

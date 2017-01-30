@@ -4,8 +4,6 @@ from restclients.canvas.sections import Sections
 from restclients.canvas.enrollments import Enrollments
 from restclients.util.retry import retry
 from urllib3.exceptions import SSLError
-from urlparse import urlparse, urlunparse
-from urllib import urlencode
 from logging import getLogger
 
 
@@ -32,11 +30,22 @@ def get_sections_in_course(course_id, user_id):
     return Sections(as_user=user_id).get_sections_in_course(course_id)
 
 
-def resize_avatar(url, image_size):
-    url_parts = urlparse(url)
-    if 'gravatar.com' in url_parts.netloc:
-        new_parts = url_parts._replace(
-            query=urlencode({'s': image_size, 'd': 'mm'})
-        )
-        return urlunparse(new_parts)
-    return url
+def get_viewable_sections(course_id, user_id):
+    limit_privileges_to_course_section = False
+    limit_sections = {}
+    for enrollment in get_enrollments_for_course(course_id, user_id):
+        if enrollment.limit_privileges_to_course_section:
+            limit_privileges_to_course_section = True
+            limit_sections[enrollment.section_id] = True
+
+    for section in get_sections_for_course(course_id, user_id):
+        if (limit_privileges_to_course_section and
+                section.section_id not in limit_sections):
+            continue
+
+        sections.append({
+            'id': section.section_id,
+            'name': section.name
+        })
+
+    return sections

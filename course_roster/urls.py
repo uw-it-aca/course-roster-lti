@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url, include
-from course_roster.views import LaunchView, CourseRoster, CourseSections,\
-    RosterPhoto
+from course_roster.views import (
+    LaunchView, CourseRoster, CourseSections, RosterPhoto)
 
 
 urlpatterns = patterns(

@@ -9,8 +9,7 @@ from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
 from sis_provisioner.exceptions import UserPolicyException
 from restclients.exceptions import DataFailureException
 from course_roster.dao.canvas import (
-    get_users_for_course, get_enrollments_for_course, get_sections_in_course,
-    resize_avatar)
+    get_users_for_course, get_viewable_sections)
 from course_roster.models import IDPhoto
 from datetime import datetime, timedelta
 from urlparse import urlparse, parse_qs
@@ -76,15 +75,16 @@ class CourseRoster(RESTDispatch):
 
         people = []
         for user in users:
+            idphoto = IDPhoto(image_size=image_size)
             try:
                 valid_reg_id(user.sis_user_id)
-                photo_url = IDPhoto(reg_id=user.sis_user_id,
-                                    image_size=image_size).get_url()
-                avatar_url = resize_avatar(user.avatar_url, image_size)
+                idphoto.reg_id = user.sis_user_id
+                photo_url = idphoto.get_url()
+                avatar_url = idphoto.get_avatar_url(user.avatar_url)
             except UserPolicyException:
                 try:
                     valid_gmail_id(user.login_id)
-                    photo_url = resize_avatar(user.avatar_url, image_size)
+                    photo_url = idphoto.get_avatar_url(user.avatar_url)
                     avatar_url = ''
                 except UserPolicyException:
                     continue
@@ -121,24 +121,8 @@ class CourseSections(RESTDispatch):
         blti_data = self.get_session(request)
         user_id = blti_data.get('custom_canvas_user_id')
 
-        sections = []
         try:
-            limit_privileges_to_course_section = False
-            limit_sections = {}
-            for enrollment in get_enrollments_for_course(course_id, user_id):
-                if enrollment.limit_privileges_to_course_section:
-                    limit_privileges_to_course_section = True
-                    limit_sections[enrollment.section_id] = True
-
-            for section in get_sections_for_course(course_id, user_id):
-                if (limit_privileges_to_course_section and
-                        section.section_id not in limit_sections):
-                    continue
-
-                sections.append({
-                    'id': section.section_id,
-                    'name': section.name
-                })
+            sections = get_viewable_sections(course_id, user_id)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 

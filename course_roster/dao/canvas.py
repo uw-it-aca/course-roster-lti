@@ -12,11 +12,13 @@ logger = getLogger(__name__)
 
 @retry(SSLError, tries=3, delay=1, logger=logger)
 def get_users_for_course(course_id, user_id, page):
-    return Users(as_user=user_id).get_users_for_course(course_id, params={
+    canvas = Users(as_user=user_id)
+    users = canvas.get_users_for_course(course_id, params={
         'page': page,
         'per_page': getattr(settings, 'COURSE_ROSTER_PER_PAGE', 50),
         'enrollment_type': ['student'],
         'include': ['enrollments', 'avatar_url']})
+    return (users, canvas.next_page_url)
 
 
 @retry(SSLError, tries=3, delay=1, logger=logger)
@@ -38,6 +40,7 @@ def get_viewable_sections(course_id, user_id):
             limit_privileges_to_course_section = True
             limit_sections[enrollment.section_id] = True
 
+    sections = []
     for section in get_sections_in_course(course_id, user_id):
         if (limit_privileges_to_course_section and
                 section.section_id not in limit_sections):
@@ -47,5 +50,4 @@ def get_viewable_sections(course_id, user_id):
             'id': section.section_id,
             'name': section.name
         })
-
     return sections

@@ -10,8 +10,9 @@ class CanvasDAOTest(TestCase):
         r = get_users_for_course('123', '456', '10')
         mock_object.assert_called_with(as_user='456')
 
+    @mock.patch.object(Users, 'next_page_url', create=True)
     @mock.patch.object(Users, 'get_users_for_course')
-    def test_get_course_users(self, mock_method):
+    def test_get_course_users(self, mock_method, mock_attribute):
         with self.settings(COURSE_ROSTER_PER_PAGE=1000):
             r = get_users_for_course('123', '456', '10')
             mock_method.assert_called_with('123', params={

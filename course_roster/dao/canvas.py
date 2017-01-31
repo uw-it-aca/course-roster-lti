@@ -38,7 +38,7 @@ def get_viewable_sections(course_id, user_id):
             limit_privileges_to_course_section = True
             limit_sections[enrollment.section_id] = True
 
-    for section in get_sections_for_course(course_id, user_id):
+    for section in get_sections_in_course(course_id, user_id):
         if (limit_privileges_to_course_section and
                 section.section_id not in limit_sections):
             continue

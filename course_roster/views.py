@@ -69,7 +69,7 @@ class CourseRoster(RESTDispatch):
         user_id = blti_data.get('custom_canvas_user_id')
 
         try:
-            users = get_users_for_course(course_id, user_id, page)
+            (users, next_url) = get_users_for_course(course_id, user_id, page)
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
@@ -101,7 +101,7 @@ class CourseRoster(RESTDispatch):
             })
 
         try:
-            url_parts = urlparse(canvas.next_page_url)
+            url_parts = urlparse(next_url)
             next_page = parse_qs(url_parts.query).get('page', [])[0]
         except Exception as err:
             next_page = None

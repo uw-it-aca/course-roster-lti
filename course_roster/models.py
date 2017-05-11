@@ -1,7 +1,10 @@
 from django.db import models
-from restclients.pws import PWS
-from urlparse import urlparse, urlunparse
-from urllib import urlencode
+from uw_pws import PWS
+try:
+    from urllib.parse import urlparse, urlunparse, urlencode
+except ImportError:
+    from urlparse import urlparse, urlunparse
+    from urllib import urlencode
 import random
 import string
 

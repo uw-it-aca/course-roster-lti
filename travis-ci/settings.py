@@ -35,9 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'restclients',
-    'userservice',
-    'sis_provisioner',
+    'sis_provisioner.apps.SISProvisionerConfig',
     'blti',
     'course_roster',
 )

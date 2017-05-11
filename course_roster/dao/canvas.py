@@ -1,8 +1,8 @@
 from django.conf import settings
-from restclients.canvas.users import Users
-from restclients.canvas.sections import Sections
-from restclients.canvas.enrollments import Enrollments
-from restclients.util.retry import retry
+from uw_canvas.users import Users
+from uw_canvas.sections import Sections
+from uw_canvas.enrollments import Enrollments
+# from sis_provisioner.util.retry import retry
 from urllib3.exceptions import SSLError
 from logging import getLogger
 
@@ -10,7 +10,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-@retry(SSLError, tries=3, delay=1, logger=logger)
+# @retry(SSLError, tries=3, delay=1, logger=logger)
 def get_users_for_course(course_id, user_id, page):
     canvas = Users(as_user=user_id)
     users = canvas.get_users_for_course(course_id, params={
@@ -21,13 +21,13 @@ def get_users_for_course(course_id, user_id, page):
     return (users, canvas.next_page_url)
 
 
-@retry(SSLError, tries=3, delay=1, logger=logger)
+# @retry(SSLError, tries=3, delay=1, logger=logger)
 def get_enrollments_for_course(course_id, user_id):
     return Enrollments().get_enrollments_for_course(course_id, params={
         'user_id': user_id})
 
 
-@retry(SSLError, tries=3, delay=1, logger=logger)
+# @retry(SSLError, tries=3, delay=1, logger=logger)
 def get_sections_in_course(course_id, user_id):
     return Sections(as_user=user_id).get_sections_in_course(course_id)
 

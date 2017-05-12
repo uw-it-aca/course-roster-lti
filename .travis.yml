@@ -4,8 +4,8 @@ python:
   - "2.7"
 before_install:
   - cp travis-ci/test_requirements.txt requirements.txt
-install: pip install -r requirements.txt
 before_script:
+  - pip install -r requirements.txt
   - pip install coverage
   - pip install python-coveralls
   - pip install pep8
@@ -15,6 +15,18 @@ script:
   - pep8 course_roster/ --exclude=migrations
   - jshint course_roster/static/course_roster/js/ --verbose
   - coverage run --source=course_roster/ manage.py test course_roster
-after_script:
+after_success:
   - coveralls
-notifications:
+before_deploy:
+- find course_roster/ -name \*.pyc -exec rm {} \;
+- echo $TRAVIS_TAG > course_roster/VERSION
+deploy:
+  provider: pypi
+  server: https://pypi.python.org/pypi
+  user: uw-it-aca
+  skip_cleanup: true
+  password:
+    secure:
+  on:
+    tags: true
+    python: '2.7'

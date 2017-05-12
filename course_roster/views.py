@@ -7,12 +7,15 @@ from blti.views import BLTILaunchView
 from blti.views.rest_dispatch import RESTDispatch
 from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
 from sis_provisioner.exceptions import UserPolicyException
-from restclients.exceptions import DataFailureException
+from restclients_core.exceptions import DataFailureException
 from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
 from course_roster.models import IDPhoto
 from datetime import datetime, timedelta
-from urlparse import urlparse, parse_qs
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
 
 
 class LaunchView(BLTILaunchView):

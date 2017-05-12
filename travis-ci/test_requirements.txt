@@ -1,5 +1,3 @@
 -e .
--e git+https://github.com/uw-it-aca/django-blti#egg=django_blti
--e git+https://github.com/uw-it-aca/django-userservice#egg=Django-UserService
 -e git+https://github.com/uw-it-aca/uw-restclients#egg=RestClients
--e git+https://github.com/uw-it-aca/canvas-sis-provisioner.git@qa#egg=sis_provisioner
+-e git+https://github.com/uw-it-aca/canvas-sis-provisioner#egg=sis_provisioner

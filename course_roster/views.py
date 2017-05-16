@@ -1,6 +1,5 @@
 from django.db import transaction
 from django.http import HttpResponse, StreamingHttpResponse
-from django.core.context_processors import csrf
 from django.utils.timezone import utc
 from django.views.generic import View
 from blti.views import BLTILaunchView
@@ -26,13 +25,11 @@ class LaunchView(BLTILaunchView):
         request = kwargs.get('request')
         blti_data = kwargs.get('blti_params')
 
-        context = {
+        return {
             'session_id': request.session.session_key,
             'canvas_course_id': blti_data.get('custom_canvas_course_id'),
             'course_name': blti_data.get('context_label', 'this course')
         }
-        context.update(csrf(request))
-        return context
 
 
 class RosterPhoto(View):

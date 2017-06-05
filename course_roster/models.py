@@ -1,10 +1,9 @@
 from django.db import models
 from uw_pws import PWS
 try:
-    from urllib.parse import urlparse, urlunparse, urlencode
+    from urllib.parse import urlparse, urlunparse
 except ImportError:
     from urlparse import urlparse, urlunparse
-    from urllib import urlencode
 import random
 import string
 
@@ -35,8 +34,6 @@ class IDPhoto(models.Model):
         """
         url_parts = urlparse(url)
         if 'gravatar.com' in url_parts.netloc:
-            new_parts = url_parts._replace(
-                query=urlencode({'s': self.image_size, 'd': 'mm'})
-            )
+            new_parts = url_parts._replace(query='s=%s&d=mm' % self.image_size)
             return urlunparse(new_parts)
         return url

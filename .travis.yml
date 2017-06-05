@@ -2,6 +2,9 @@ sudo: false
 language: python
 python:
 - '2.7'
+- '3.4'
+- '3.5'
+- '3.6'
 before_install:
 - cp travis-ci/test_requirements.txt requirements.txt
 before_script:
@@ -29,4 +32,4 @@ deploy:
     secure: iWhrwR9e84pFWYlXmjaEchJZjArUbjE7Bb1lOxR4MratrKAdrXMS2JWjcE5g6/eiYLw0qTnLlW581rwX+FxH8IiaH/dj94Yf15m8BhrSMvMBghjbA/WdGcueQ4/tn2aZb69kD1NEoNQ9v9c7EuG4s6FnjuUDI++Qkmqg7RX5UhrnvwOYZ0SLjck+Kopb1rXn/d2OOFk3pfbJ30PdCrmzlcpzrhVppKxHQBFLSZzuRCujcA421nuOeCgeDZJ2Xw7FMYM4qCTT7oTu2WPT63/be2DOmxUoZrVcwThUaaZSZ5uwdI9/vvyrLFSMTHD9FtBu2V7mACw2QIeBaoYYQtjpp3TDd/57nUGT0tF4UcN6NLWvw4/EhtptUGbvOc+UAp7kXHiOtiOOirMT6BpF0ILiLyE4BsTdw4SzKacSSQ8cBfGxRAPs+ARns0cGZAfdthrjHD4SY2G2nVToPJvEXFlC4xlnz8ET5owDhIeafsPvt6bbzxV+4IBGBz2PNF35sYXeaTPE5UTB0LiV6pCze8sCYOjl6x9sCC476UJYj5aI296ZcLx2AeVdR/XiZ18b19d6yqVa6hLJOTmoxsJaGWwegSwq7phpHAJ/V4CcWhAB3Mnk+pij/PLIjm6pF39mZHjV1HG+162AZfQz+L0yOIVNnTNh0cb5Y8UiqUe8ikdCwm0=
   on:
     tags: true
-    python: '2.7'
+    python: '3.5'

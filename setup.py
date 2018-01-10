@@ -21,7 +21,8 @@ setup(
     include_package_data=True,
     install_requires = [
         'Django>=1.10,<1.11',
-        'django-blti>=0.1',
+        'django-blti>=1.2',
+        'UW-RestClients-Canvas>=0.6.6,<1.0',
         'UW-RestClients-PWS>=0.5,<1.0',
     ],
     license='Apache License, Version 2.0',

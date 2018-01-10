@@ -11,11 +11,11 @@ before_script:
 - pip install -r requirements.txt
 - pip install coverage
 - pip install python-coveralls
-- pip install pep8
-- npm install jshint
+- pip install pycodestyle
+- npm install -g jshint
 - cp travis-ci/manage.py manage.py
 script:
-- pep8 course_roster/ --exclude=migrations
+- pycodestyle course_roster/ --exclude=migrations
 - jshint course_roster/static/course_roster/js/ --verbose
 - coverage run --source=course_roster/ manage.py test course_roster
 after_success:
@@ -25,7 +25,6 @@ before_deploy:
 - echo $TRAVIS_TAG > course_roster/VERSION
 deploy:
   provider: pypi
-  server: https://pypi.python.org/pypi
   user: uw-it-aca
   skip_cleanup: true
   password:

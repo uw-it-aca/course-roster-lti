@@ -2,8 +2,7 @@ from django.db import transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.timezone import utc
 from django.views.generic import View
-from blti.views import BLTILaunchView
-from blti.views.rest_dispatch import RESTDispatch
+from blti.views import BLTILaunchView, RESTDispatch
 from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
 from sis_provisioner.exceptions import UserPolicyException
 from restclients_core.exceptions import DataFailureException
@@ -23,12 +22,11 @@ class LaunchView(BLTILaunchView):
 
     def get_context_data(self, **kwargs):
         request = kwargs.get('request')
-        blti_data = kwargs.get('blti_params')
 
         return {
             'session_id': request.session.session_key,
-            'canvas_course_id': blti_data.get('custom_canvas_course_id'),
-            'course_name': blti_data.get('context_label', 'this course')
+            'canvas_course_id': self.blti.canvas_course_id,
+            'course_name': self.blti.course_short_name,
         }
 
 
@@ -56,17 +54,17 @@ class RosterPhoto(View):
 
 
 class CourseRoster(RESTDispatch):
+    authorized_role = 'admin'
+
     @transaction.atomic
-    def GET(self, request, **kwargs):
+    def get(self, request, *args, **kwargs):
         course_id = kwargs.get('canvas_course_id', None)
         image_size = request.GET.get('image_size', 120)
         page = request.GET.get('page', 1)
+        user_id = self.blti.canvas_user_id
 
         if not course_id:
             return self.error_response(400, 'Missing course ID')
-
-        blti_data = self.get_session(request)
-        user_id = blti_data.get('custom_canvas_user_id')
 
         try:
             (users, next_url) = get_users_for_course(course_id, user_id, page)
@@ -116,10 +114,11 @@ class CourseSections(RESTDispatch):
     """ Performs actions on Canvas Course Sections
         GET returns 200 with course sections.
     """
-    def GET(self, request, **kwargs):
+    authorized_role = 'admin'
+
+    def get(self, request, *args, **kwargs):
         course_id = kwargs['canvas_course_id']
-        blti_data = self.get_session(request)
-        user_id = blti_data.get('custom_canvas_user_id')
+        user_id = self.blti.canvas_user_id
 
         try:
             sections = get_viewable_sections(course_id, user_id)

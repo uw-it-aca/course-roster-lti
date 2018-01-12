@@ -21,10 +21,8 @@ class LaunchView(BLTILaunchView):
     authorized_role = 'admin'
 
     def get_context_data(self, **kwargs):
-        request = kwargs.get('request')
-
         return {
-            'session_id': request.session.session_key,
+            'session_id': self.request.session.session_key,
             'canvas_course_id': self.blti.canvas_course_id,
             'course_name': self.blti.course_short_name,
         }

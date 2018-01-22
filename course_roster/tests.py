@@ -18,6 +18,7 @@ class CanvasDAOTest(TestCase):
             mock_method.assert_called_with('123', params={
                 'page': '10',
                 'per_page': 1000,
+                'enrollment_state': ['active'],
                 'enrollment_type': ['student'],
                 'include': ['enrollments', 'avatar_url']})
 

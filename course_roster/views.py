@@ -10,10 +10,7 @@ from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
 from course_roster.models import IDPhoto
 from datetime import datetime, timedelta
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 
 class LaunchView(BLTILaunchView):
@@ -40,7 +37,8 @@ class RosterPhoto(View):
             response = StreamingHttpResponse(
                 IDPhoto.objects.get(url_key=photo_key).get(),
                 content_type='image/jpeg')
-            response['Cache-Control'] = 'public,max-age=%s' % self.cache_time
+            response['Cache-Control'] = 'public,max-age={}'.format(
+                self.cache_time)
             response['Expires'] = expires.strftime(self.date_format)
             response['Last-Modified'] = now.strftime(self.date_format)
             return response
@@ -85,7 +83,7 @@ class CourseRoster(RESTDispatch):
                 except UserPolicyException:
                     continue
 
-            search_name = '%s %s' % (user.name, user.login_id)
+            search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
                 'photo_url': photo_url,

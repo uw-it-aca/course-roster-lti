@@ -21,18 +21,18 @@
     </div>
 </div>
 
-{% load templatetag_handlebars %}
-{% tplhandlebars "section-filter-tmpl" %}
+{% verbatim %}
+<script id="section-filter-tmpl" type="text/x-handlebars-template">
 <select id="section-filter" aria-label="Limit search to section" name="section" class="form-control">
     <option value="">All Sections</option>{{# each sections}}
     <option value="{{id}}">{{name}}</option>{{/each}}
 </select>
-{% endtplhandlebars %}
+</script>
+{% endverbatim %}
 
-{% tplhandlebars "thumbnail-grid-tmpl" %}
-
+{% verbatim %}
+<script id="thumbnail-grid-tmpl" type="text/x-handlebars-template">
 {{# each people}}
-
     <div class="person-container hidden col-sm-2 col-xs-3" data-sections="{{# each sections}}{{this}}:{{/each}}" data-names="{{search_name}}">
         <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a><br/>
         <div class="name-container">
@@ -43,7 +43,7 @@
         </div>
     </div>
 {{/each}}
-
-{% endtplhandlebars %}
+</script>
+{% endverbatim %}
 
 {% endblock %}

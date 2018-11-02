@@ -20,10 +20,10 @@ setup(
     packages=['course_roster'],
     include_package_data=True,
     install_requires = [
-        'Django>=1.10,<1.11',
-        'django-blti>=1.2.4',
-        'UW-RestClients-Canvas>=0.6.6,<1.0',
-        'UW-RestClients-PWS>=0.5,<1.0',
+        'Django>=2.1',
+        'django-blti>=2.0',
+        'UW-RestClients-Canvas>=1.0.1,<2.0',
+        'UW-RestClients-PWS>=2.0,<3.0',
     ],
     license='Apache License, Version 2.0',
     description='Display a roster of UW course people, with official photos',
@@ -38,7 +38,6 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',
     ],
 )

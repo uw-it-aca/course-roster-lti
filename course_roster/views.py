@@ -11,7 +11,6 @@ from course_roster.dao.canvas import (
 from course_roster.models import IDPhoto
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
-from urllib3.exceptions import MaxRetryError
 
 
 class LaunchView(BLTILaunchView):
@@ -43,7 +42,7 @@ class RosterPhoto(View):
             response['Expires'] = expires.strftime(self.date_format)
             response['Last-Modified'] = now.strftime(self.date_format)
             return response
-        except (DataFailureException, MaxRetryError) as err:
+        except DataFailureException as err:
             return HttpResponse(status=getattr(err, 'status', 503))
         except IDPhoto.DoesNotExist:
             status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404

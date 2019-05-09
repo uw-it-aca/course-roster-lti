@@ -3,8 +3,6 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.timezone import utc
 from django.views.generic import View
 from blti.views import BLTILaunchView, RESTDispatch
-from sis_provisioner.dao.user import valid_reg_id, valid_gmail_id
-from sis_provisioner.exceptions import UserPolicyException
 from restclients_core.exceptions import DataFailureException
 from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
@@ -69,24 +67,12 @@ class CourseRoster(RESTDispatch):
 
         people = []
         for user in users:
-            idphoto = IDPhoto(image_size=image_size)
-            try:
-                valid_reg_id(user.sis_user_id)
-                idphoto.reg_id = user.sis_user_id
-                photo_url = idphoto.get_url()
-                avatar_url = idphoto.get_avatar_url(user.avatar_url)
-            except UserPolicyException:
-                try:
-                    valid_gmail_id(user.login_id)
-                    photo_url = idphoto.get_avatar_url(user.avatar_url)
-                    avatar_url = ''
-                except UserPolicyException:
-                    continue
-
+            idphoto = IDPhoto(reg_id=user.sis_user_id, image_size=image_size)
+            avatar_url = idphoto.get_avatar_url(user.avatar_url)
             search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
-                'photo_url': photo_url,
+                'photo_url': idphoto.get_url() or avatar_url,
                 'avatar_url': avatar_url,
                 'login_id': user.login_id,
                 'name': user.name,

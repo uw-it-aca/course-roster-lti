@@ -1,2 +1,0 @@
--e .
--e git+https://github.com/uw-it-aca/canvas-sis-provisioner#egg=sis_provisioner

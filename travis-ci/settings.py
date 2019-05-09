@@ -13,7 +13,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'sis_provisioner.apps.SISProvisionerConfig',
     'course_roster',
     'blti',
 )

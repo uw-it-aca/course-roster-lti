@@ -20,11 +20,12 @@ class IDPhoto(models.Model):
     def get_url(self):
         """ Returns a url for the IDPhoto
         """
-        if not self.url_key:
-            self.url_key = ''.join(random.SystemRandom().choice(
-                string.ascii_lowercase + string.digits) for _ in range(16))
-            self.save()
-        return "/roster/photos/{}".format(self.url_key)
+        if PWS().valid_uwregid(self.reg_id):
+            if not self.url_key:
+                self.url_key = ''.join(random.SystemRandom().choice(
+                    string.ascii_lowercase + string.digits) for _ in range(16))
+                self.save()
+            return "/roster/photos/{}".format(self.url_key)
 
     def get_avatar_url(self, url):
         """ Modifies the passed url based on self.image_size

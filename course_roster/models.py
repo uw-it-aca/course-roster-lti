@@ -47,7 +47,7 @@ class IDPhotoTokenCache(object):
             self.client = IDPhotoTokenCache._memcached_cache[thread_id]
             return
 
-        servers = getattr(settings, 'RESTCLIENTS_MEMCACHED_SERVERS', [])
+        servers = getattr(settings, 'RESTCLIENTS_MEMCACHED_SERVERS', ())
         self.client = Client(servers)
         IDPhotoTokenCache._memcached_cache[thread_id] = self.client
 

@@ -14,4 +14,7 @@ STATICFILES_FINDERS += ("compressor.finders.CompressorFinder",)
 
 COURSE_ROSTER_PER_PAGE = 50
 
+if os.getenv('ENV', 'localdev') == 'localdev':
+    RESTCLIENTS_MEMCACHED_SERVERS = ('127.0.0.1:11211',)
+
 LOGGING = {}

@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.timezone import utc
 from django.views.generic import View
@@ -33,7 +33,7 @@ class RosterPhoto(View):
         expires = now + timedelta(seconds=self.cache_time)
         try:
             response = StreamingHttpResponse(
-                IDPhoto.objects.get(url_key=photo_key).get(),
+                IDPhoto(url_key=photo_key).get(),
                 content_type='image/jpeg')
             response['Cache-Control'] = 'public,max-age={}'.format(
                 self.cache_time)
@@ -42,7 +42,7 @@ class RosterPhoto(View):
             return response
         except DataFailureException:
             return HttpResponse(status=503)
-        except IDPhoto.DoesNotExist:
+        except ObjectDoesNotExist:
             status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
             return HttpResponse(status=status)
 
@@ -50,7 +50,6 @@ class RosterPhoto(View):
 class CourseRoster(RESTDispatch):
     authorized_role = 'admin'
 
-    @transaction.atomic
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get('canvas_course_id', None)
         image_size = request.GET.get('image_size', 120)

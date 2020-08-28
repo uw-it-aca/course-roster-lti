@@ -1,29 +1,40 @@
-sudo: false
+sudo: required
+
 language: python
 python:
 - '3.6'
+
+services:
+- docker
+
+os:
+- linux
+
+env:
+  global:
+  - RELEASE_NAME="course_roster"
+  - DJANGO_APP="course_roster"
+  - COMMIT_HASH="$(git rev-parse --short=7 HEAD)"
+  - IMAGE_TAG="${RELEASE_NAME}:${COMMIT_HASH}"
+  - DEPLOY_SCRIPT_BASE=https://raw.githubusercontent.com/uw-it-aca/gcp-app-deploy/master
+
+install:
+- docker build --target app-container -t "$IMAGE_TAG" .
+- docker build -t "${IMAGE_TAG}-test" .
+
 before_script:
-- pip install -e .
 - pip install coverage
 - pip install coveralls
-- pip install pycodestyle
-- npm install -g jshint
-- cp travis-ci/manage.py manage.py
+
 script:
-- pycodestyle course_roster/ --exclude=migrations
-- jshint course_roster/static/course_roster/js/ --verbose
-- coverage run --source=course_roster/ manage.py test course_roster
+- docker run -u root -it -v /tmp:/coverage -e DJANGO_APP="$DJANGO_APP" -e "ENV=localdev" -e "AUTH=BLTI_DEV" "${IMAGE_TAG}-test" bash -c ". ./travis-ci/test.sh"
+
 after_success:
+- cp /tmp/.coverage.* .
+- coverage combine
 - coveralls
-before_deploy:
-- find course_roster/ -name \*.pyc -exec rm {} \;
-- echo $TRAVIS_TAG > course_roster/VERSION
-deploy:
-  provider: pypi
-  user: uw-it-aca
-  skip_cleanup: true
-  password:
-    secure: iWhrwR9e84pFWYlXmjaEchJZjArUbjE7Bb1lOxR4MratrKAdrXMS2JWjcE5g6/eiYLw0qTnLlW581rwX+FxH8IiaH/dj94Yf15m8BhrSMvMBghjbA/WdGcueQ4/tn2aZb69kD1NEoNQ9v9c7EuG4s6FnjuUDI++Qkmqg7RX5UhrnvwOYZ0SLjck+Kopb1rXn/d2OOFk3pfbJ30PdCrmzlcpzrhVppKxHQBFLSZzuRCujcA421nuOeCgeDZJ2Xw7FMYM4qCTT7oTu2WPT63/be2DOmxUoZrVcwThUaaZSZ5uwdI9/vvyrLFSMTHD9FtBu2V7mACw2QIeBaoYYQtjpp3TDd/57nUGT0tF4UcN6NLWvw4/EhtptUGbvOc+UAp7kXHiOtiOOirMT6BpF0ILiLyE4BsTdw4SzKacSSQ8cBfGxRAPs+ARns0cGZAfdthrjHD4SY2G2nVToPJvEXFlC4xlnz8ET5owDhIeafsPvt6bbzxV+4IBGBz2PNF35sYXeaTPE5UTB0LiV6pCze8sCYOjl6x9sCC476UJYj5aI296ZcLx2AeVdR/XiZ18b19d6yqVa6hLJOTmoxsJaGWwegSwq7phpHAJ/V4CcWhAB3Mnk+pij/PLIjm6pF39mZHjV1HG+162AZfQz+L0yOIVNnTNh0cb5Y8UiqUe8ikdCwm0=
-  on:
-    tags: true
-    python: '3.6'
+
+cache:
+  directories:
+  - "$HOME/helm"
+  - "$HOME/kubeval"

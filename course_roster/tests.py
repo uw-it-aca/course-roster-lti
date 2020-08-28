@@ -44,12 +44,17 @@ class CanvasDAOTest(TestCase):
 class IDPhotoTest(TestCase):
     @mock.patch.object(PWS, 'get_idcard_photo')
     def test_get_idphoto(self, mock_method):
-        idphoto = IDPhoto(id=1, image_size=120,
+        idphoto = IDPhoto(image_size=120,
                           reg_id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        url = idphoto.get_url()
 
+        idphoto = IDPhoto(url_key=url.replace('/roster/photos/', ''))
         r = idphoto.get()
         mock_method.assert_called_with(
             'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', size=120)
+
+        # Key no longer exists
+        self.assertRaises(ObjectDoesNotExist, idphoto.get)
 
     def test_get_url(self):
         idphoto = IDPhoto(image_size=120,

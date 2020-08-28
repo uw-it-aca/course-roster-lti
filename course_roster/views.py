@@ -33,7 +33,7 @@ class RosterPhoto(View):
         expires = now + timedelta(seconds=self.cache_time)
         try:
             response = StreamingHttpResponse(
-                IDPhoto(url_key=photo_key).get(),
+                IDPhoto().get(photo_key),
                 content_type='image/jpeg')
             response['Cache-Control'] = 'public,max-age={}'.format(
                 self.cache_time)
@@ -64,14 +64,15 @@ class CourseRoster(RESTDispatch):
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
+        idphoto = IDPhoto()
         people = []
         for user in users:
-            idphoto = IDPhoto(reg_id=user.sis_user_id, image_size=image_size)
             avatar_url = idphoto.get_avatar_url(user.avatar_url)
             search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
-                'photo_url': idphoto.get_url() or avatar_url,
+                'photo_url': idphoto.get_url(
+                    user.sis_user_id, image_size) or avatar_url,
                 'avatar_url': avatar_url,
                 'login_id': user.login_id,
                 'name': user.name,

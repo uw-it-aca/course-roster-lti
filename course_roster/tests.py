@@ -44,31 +44,32 @@ class CanvasDAOTest(TestCase):
 class IDPhotoTest(TestCase):
     @mock.patch.object(PWS, 'get_idcard_photo')
     def test_get_idphoto(self, mock_method):
-        idphoto = IDPhoto(image_size=120,
-                          reg_id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        url = idphoto.get_url()
+        reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        image_size = 120
 
-        idphoto = IDPhoto(url_key=url.replace('/roster/photos/', ''))
-        r = idphoto.get()
-        mock_method.assert_called_with(
-            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', size=120)
+        url = IDPhoto().get_url(reg_id, image_size)
+
+        url_key = url.replace('/roster/photos/', '')
+
+        r = IDPhoto().get(url_key)
+        mock_method.assert_called_with(reg_id, size=image_size)
 
         # Key no longer exists
-        self.assertRaises(ObjectDoesNotExist, idphoto.get)
+        self.assertRaises(ObjectDoesNotExist, idphoto.get, url_key)
 
     def test_get_url(self):
-        idphoto = IDPhoto(image_size=120,
-                          reg_id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        image_size = 120
 
         self.assertRegexpMatches(
-            idphoto.get_url(), r'^/roster/photos/[a-z0-9]{16}')
+            IDPhoto.get_url(reg_id, image_size),
+            r'^/roster/photos/[a-z0-9]{16}')
 
     def test_get_url_with_invalid_reg_id(self):
-        idphoto = IDPhoto(image_size=120, reg_id='invalid')
-        self.assertEqual(idphoto.get_url(), None)
+        reg_id = 'invalid'
+        image_size = 120
 
-        idphoto = IDPhoto(image_size=120)
-        self.assertEqual(idphoto.get_url(), None)
+        self.assertEqual(IDPhoto.get_url(reg_id, image_size), None)
 
     def test_get_avatar_url(self):
         idphoto = IDPhoto(image_size=120)

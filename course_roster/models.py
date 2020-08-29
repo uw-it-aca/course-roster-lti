@@ -33,7 +33,7 @@ class IDPhoto(object):
     def get_url(self, reg_id, image_size):
         """ Returns a url for the IDPhoto
         """
-        if PWS().valid_uwregid(self.reg_id):
+        if PWS().valid_uwregid(reg_id):
             url_key = ''.join(random.SystemRandom().choice(
                 string.ascii_lowercase + string.digits) for _ in range(16))
 
@@ -43,12 +43,12 @@ class IDPhoto(object):
 
             return "/roster/photos/{}".format(url_key)
 
-    def get_avatar_url(self, url):
+    def get_avatar_url(self, url, image_size):
         """ Modifies the passed url based on self.image_size
         """
         url_parts = urlparse(url)
         if 'gravatar.com' in url_parts.netloc:
             new_parts = url_parts._replace(
-                query='s={}&d=mm'.format(self.image_size))
+                query='s={}&d=mm'.format(image_size))
             return urlunparse(new_parts)
         return url

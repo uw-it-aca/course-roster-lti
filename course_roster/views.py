@@ -67,7 +67,7 @@ class CourseRoster(RESTDispatch):
         idphoto = IDPhoto()
         people = []
         for user in users:
-            avatar_url = idphoto.get_avatar_url(user.avatar_url)
+            avatar_url = idphoto.get_avatar_url(user.avatar_url, image_size)
             search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,

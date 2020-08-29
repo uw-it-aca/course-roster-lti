@@ -62,14 +62,14 @@ class IDPhotoTest(TestCase):
         image_size = 120
 
         self.assertRegexpMatches(
-            IDPhoto.get_url(reg_id, image_size),
+            IDPhoto().get_url(reg_id, image_size),
             r'^/roster/photos/[a-z0-9]{16}')
 
     def test_get_url_with_invalid_reg_id(self):
         reg_id = 'invalid'
         image_size = 120
 
-        self.assertEqual(IDPhoto.get_url(reg_id, image_size), None)
+        self.assertEqual(IDPhoto().get_url(reg_id, image_size), None)
 
     def test_get_avatar_url(self):
         idphoto = IDPhoto(image_size=120)

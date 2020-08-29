@@ -55,7 +55,7 @@ class IDPhotoTest(TestCase):
         mock_method.assert_called_with(reg_id, size=image_size)
 
         # Key no longer exists
-        self.assertRaises(ObjectDoesNotExist, idphoto.get, url_key)
+        self.assertRaises(ObjectDoesNotExist, IDPhoto().get, url_key)
 
     def test_get_url(self):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -72,10 +72,11 @@ class IDPhotoTest(TestCase):
         self.assertEqual(IDPhoto().get_url(reg_id, image_size), None)
 
     def test_get_avatar_url(self):
-        idphoto = IDPhoto(image_size=120)
+        image_size = 120
         self.assertEquals(
-            idphoto.get_avatar_url('http://xyz.edu/img/123.png'),
+            IDPhoto().get_avatar_url('http://xyz.edu/img/123.png', image_size),
             'http://xyz.edu/img/123.png')
         self.assertEquals(
-            idphoto.get_avatar_url('https://gravatar.com/avatar/abcdef?s=320'),
+            IDPhoto().get_avatar_url(
+                'https://gravatar.com/avatar/abcdef?s=320' image_size),
             'https://gravatar.com/avatar/abcdef?s=120&d=mm')

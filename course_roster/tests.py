@@ -1,6 +1,6 @@
 from django.test import TestCase
 from course_roster.dao.canvas import *
-from course_roster.models import *
+from course_roster.dao.idcard import *
 import mock
 
 
@@ -47,36 +47,36 @@ class IDPhotoTest(TestCase):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         image_size = 120
 
-        url = IDPhoto().get_url(reg_id, image_size)
+        url = get_photo_url(reg_id, image_size)
 
         url_key = url.replace('/roster/photos/', '')
 
-        r = IDPhoto().get(url_key)
+        r = get_photo(url_key)
         mock_method.assert_called_with(reg_id, size=image_size)
 
         # Key no longer exists
-        self.assertRaises(ObjectDoesNotExist, IDPhoto().get, url_key)
+        self.assertRaises(ObjectDoesNotExist, get_photo, url_key)
 
     def test_get_url(self):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         image_size = 120
 
         self.assertRegexpMatches(
-            IDPhoto().get_url(reg_id, image_size),
+            get_photo_url(reg_id, image_size),
             r'^/roster/photos/[a-z0-9]{16}')
 
     def test_get_url_with_invalid_reg_id(self):
         reg_id = 'invalid'
         image_size = 120
 
-        self.assertEqual(IDPhoto().get_url(reg_id, image_size), None)
+        self.assertEqual(get_photo_url(reg_id, image_size), None)
 
     def test_get_avatar_url(self):
         image_size = 120
-        self.assertEquals(
-            IDPhoto().get_avatar_url('http://xyz.edu/img/123.png', image_size),
+        self.assertEqual(
+            get_avatar_url('http://xyz.edu/img/123.png', image_size),
             'http://xyz.edu/img/123.png')
-        self.assertEquals(
-            IDPhoto().get_avatar_url(
-                'https://gravatar.com/avatar/abcdef?s=320', image_size),
+        self.assertEqual(
+            get_avatar_url('https://gravatar.com/avatar/abcdef?s=320',
+                image_size),
             'https://gravatar.com/avatar/abcdef?s=120&d=mm')

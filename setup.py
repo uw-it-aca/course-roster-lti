@@ -22,6 +22,7 @@ setup(
     install_requires = [
         'Django>=2.1,<2.2',
         'django-blti>=2.1.7',
+        'python-memcached',
         'UW-RestClients-Core>=1.3.3,<2.0',
         'UW-RestClients-Canvas>=1.1.9,<2.0',
         'UW-RestClients-PWS>=2.1,<3.0',

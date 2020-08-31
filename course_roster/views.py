@@ -6,7 +6,8 @@ from blti.views import BLTILaunchView, RESTDispatch
 from restclients_core.exceptions import DataFailureException
 from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
-from course_roster.models import IDPhoto
+from course_roster.dao.idcard import (
+    get_photo, get_photo_url, get_avatar_url)
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
@@ -32,9 +33,8 @@ class RosterPhoto(View):
         now = datetime.utcnow()
         expires = now + timedelta(seconds=self.cache_time)
         try:
-            response = StreamingHttpResponse(
-                IDPhoto().get(photo_key),
-                content_type='image/jpeg')
+            response = StreamingHttpResponse(get_photo(photo_key),
+                                             content_type='image/jpeg')
             response['Cache-Control'] = 'public,max-age={}'.format(
                 self.cache_time)
             response['Expires'] = expires.strftime(self.date_format)
@@ -64,14 +64,13 @@ class CourseRoster(RESTDispatch):
         except DataFailureException as err:
             return self.error_response(500, err.msg)
 
-        idphoto = IDPhoto()
         people = []
         for user in users:
-            avatar_url = idphoto.get_avatar_url(user.avatar_url, image_size)
+            avatar_url = get_avatar_url(user.avatar_url, image_size)
             search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
-                'photo_url': idphoto.get_url(
+                'photo_url': get_photo_url(
                     user.sis_user_id, image_size) or avatar_url,
                 'avatar_url': avatar_url,
                 'login_id': user.login_id,

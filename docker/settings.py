@@ -1,7 +1,5 @@
 from .base_settings import *
 
-DEBUG = True if os.getenv('ENV', 'localdev') == 'localdev' else False
-
 INSTALLED_APPS += [
     'course_roster.apps.CourseRosterConfig',
     'compressor',
@@ -12,13 +10,18 @@ COMPRESS_PRECOMPILERS = (("text/less", "lessc {infile} {outfile}"),)
 COMPRESS_OFFLINE = True
 STATICFILES_FINDERS += ("compressor.finders.CompressorFinder",)
 
-COURSE_ROSTER_PER_PAGE = 50
-
 if os.getenv('ENV', 'localdev') == 'localdev':
+    DEBUG = True
+    RESTCLIENTS_DAO_CACHE_CLASS = None
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
+else:
+    DEBUG = False
+    RESTCLIENTS_DAO_CACHE_CLASS = 'course_roster.cache.IDCardPhotoCache'
 
-LOGGING = {}
+COURSE_ROSTER_PER_PAGE = 50
+IDCARD_PHOTO_EXPIRES = 60 * 60
+IDCARD_TOKEN_EXPIRES = 60 * 60

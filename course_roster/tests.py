@@ -78,5 +78,5 @@ class IDPhotoTest(TestCase):
             'http://xyz.edu/img/123.png')
         self.assertEqual(
             get_avatar_url('https://gravatar.com/avatar/abcdef?s=320',
-                image_size),
+                           image_size),
             'https://gravatar.com/avatar/abcdef?s=120&d=mm')

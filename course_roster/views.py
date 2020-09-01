@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.timezone import utc
 from django.views.generic import View
@@ -6,7 +6,8 @@ from blti.views import BLTILaunchView, RESTDispatch
 from restclients_core.exceptions import DataFailureException
 from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
-from course_roster.models import IDPhoto
+from course_roster.dao.idcard import (
+    get_photo, get_photo_url, get_avatar_url)
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
@@ -32,9 +33,8 @@ class RosterPhoto(View):
         now = datetime.utcnow()
         expires = now + timedelta(seconds=self.cache_time)
         try:
-            response = StreamingHttpResponse(
-                IDPhoto.objects.get(url_key=photo_key).get(),
-                content_type='image/jpeg')
+            response = StreamingHttpResponse(get_photo(photo_key),
+                                             content_type='image/jpeg')
             response['Cache-Control'] = 'public,max-age={}'.format(
                 self.cache_time)
             response['Expires'] = expires.strftime(self.date_format)
@@ -42,7 +42,7 @@ class RosterPhoto(View):
             return response
         except DataFailureException:
             return HttpResponse(status=503)
-        except IDPhoto.DoesNotExist:
+        except ObjectDoesNotExist:
             status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
             return HttpResponse(status=status)
 
@@ -50,7 +50,6 @@ class RosterPhoto(View):
 class CourseRoster(RESTDispatch):
     authorized_role = 'admin'
 
-    @transaction.atomic
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get('canvas_course_id', None)
         image_size = request.GET.get('image_size', 120)
@@ -67,12 +66,12 @@ class CourseRoster(RESTDispatch):
 
         people = []
         for user in users:
-            idphoto = IDPhoto(reg_id=user.sis_user_id, image_size=image_size)
-            avatar_url = idphoto.get_avatar_url(user.avatar_url)
+            avatar_url = get_avatar_url(user.avatar_url, image_size)
             search_name = '{} {}'.format(user.name, user.login_id)
             people.append({
                 'user_url': user.enrollments[0].html_url,
-                'photo_url': idphoto.get_url() or avatar_url,
+                'photo_url': get_photo_url(
+                    user.sis_user_id, image_size) or avatar_url,
                 'avatar_url': avatar_url,
                 'login_id': user.login_id,
                 'name': user.name,

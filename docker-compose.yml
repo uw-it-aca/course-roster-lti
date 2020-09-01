@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  app:
+    environment:
+      ENV: localdev
+      PORT: 8000
+      AUTH: BLTI_DEV
+      LTI_DEVELOP_APP: course_roster
+      MEMCACHED_SERVER_COUNT: 1
+      MEMCACHED_SERVER_SPEC: memcached
+      SESSION_BACKEND: MEMCACHED
+    restart: always
+    container_name: app-courseroster
+    build:
+      context: .
+    volumes:
+      - ./course_roster:/app/course_roster
+    ports:
+      - "8000:8000"

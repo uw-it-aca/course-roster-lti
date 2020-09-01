@@ -1,6 +1,6 @@
 from django.test import TestCase
 from course_roster.dao.canvas import *
-from course_roster.models import *
+from course_roster.dao.idcard import *
 import mock
 
 
@@ -44,32 +44,39 @@ class CanvasDAOTest(TestCase):
 class IDPhotoTest(TestCase):
     @mock.patch.object(PWS, 'get_idcard_photo')
     def test_get_idphoto(self, mock_method):
-        idphoto = IDPhoto(id=1, image_size=120,
-                          reg_id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        image_size = 120
 
-        r = idphoto.get()
-        mock_method.assert_called_with(
-            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', size=120)
+        url = get_photo_url(reg_id, image_size)
+
+        url_key = url.replace('/roster/photos/', '')
+
+        r = get_photo(url_key)
+        mock_method.assert_called_with(reg_id, size=image_size)
+
+        # Key no longer exists
+        self.assertRaises(ObjectDoesNotExist, get_photo, url_key)
 
     def test_get_url(self):
-        idphoto = IDPhoto(image_size=120,
-                          reg_id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+        image_size = 120
 
         self.assertRegexpMatches(
-            idphoto.get_url(), r'^/roster/photos/[a-z0-9]{16}')
+            get_photo_url(reg_id, image_size),
+            r'^/roster/photos/[a-z0-9]{16}')
 
     def test_get_url_with_invalid_reg_id(self):
-        idphoto = IDPhoto(image_size=120, reg_id='invalid')
-        self.assertEqual(idphoto.get_url(), None)
+        reg_id = 'invalid'
+        image_size = 120
 
-        idphoto = IDPhoto(image_size=120)
-        self.assertEqual(idphoto.get_url(), None)
+        self.assertEqual(get_photo_url(reg_id, image_size), None)
 
     def test_get_avatar_url(self):
-        idphoto = IDPhoto(image_size=120)
-        self.assertEquals(
-            idphoto.get_avatar_url('http://xyz.edu/img/123.png'),
+        image_size = 120
+        self.assertEqual(
+            get_avatar_url('http://xyz.edu/img/123.png', image_size),
             'http://xyz.edu/img/123.png')
-        self.assertEquals(
-            idphoto.get_avatar_url('https://gravatar.com/avatar/abcdef?s=320'),
+        self.assertEqual(
+            get_avatar_url('https://gravatar.com/avatar/abcdef?s=320',
+                           image_size),
             'https://gravatar.com/avatar/abcdef?s=120&d=mm')

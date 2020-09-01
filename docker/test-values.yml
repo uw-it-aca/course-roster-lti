@@ -1,0 +1,98 @@
+ingress:
+  enabled: true
+  tls:
+    courseroster:
+      secretName: test-courseroster.canvas.uw.edu-ingress-cert
+      hosts:
+        - test-courseroster.canvas.uw.edu
+  hosts:
+    courseroster:
+      host: test-courseroster.canvas.uw.edu
+      paths:
+        - "/"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+lifecycle:
+  enabled: true
+  preStop:
+    enabled: true
+affinity:
+   podsSpanNodes: true
+readiness:
+  enabled: true
+database:
+  engine: null
+repo: course-roster
+instance: test
+image:
+  repository: registry.hub.docker.com/acait/course-roster
+  tag: IMAGE_TAG
+memcached:
+  enabled: true
+  replicaCount: 1
+  updateStrategy:
+    type: RollingUpdate
+certs:
+  mounted: true
+  certPath: /certs/test-courseroster.canvas.uw.edu-uwca.cert
+  keyPath: /certs/test-courseroster.canvas.uw.edu-uwca.key
+  secretName: test-courseroster.canvas.uw.edu-uwca-certs
+environmentVariables:
+  - name: CLUSTER_CNAME
+    value: test-courseroster.canvas.uw.edu
+  - name: AUTH
+    value: BLTI
+  - name: ENV
+    value: test
+  - name: SESSION_BACKEND
+    value: MEMCACHED
+  - name: PWS_ENV
+    value: PROD
+  - name: CANVAS_ENV
+    value: EVAL
+  - name: CANVAS_TIMEOUT
+    value: "10"
+externalSecrets:
+  enabled: true
+  secrets:
+    - name: test-courseroster.canvas.uw.edu-secrets
+      externalKey: axdd/kv/data/course-roster/test/secrets
+      data:
+        - name: django-secret
+          property: django-secret
+        - name: lti-consumers
+          property: lti-consumers
+        - name: blti-aes-key
+          property: blti-aes-key
+        - name: blti-aes-iv
+          property: blti-aes-iv
+        - name: canvas-api-token
+          property: canvas-api-token
+    - name: test-courseroster.canvas.uw.edu-uwca-certs
+      externalKey: axdd/kv/data/course-roster/test/uwca-certs
+      data:
+        - name: test-courseroster.canvas.uw.edu-uwca.cert
+          property: test-courseroster.canvas.uw.edu-uwca.cert
+        - name: test-courseroster.canvas.uw.edu-uwca.key
+          property: test-courseroster.canvas.uw.edu-uwca.key
+environmentVariablesSecrets:
+  django-secret:
+    name: DJANGO_SECRET
+    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretKey: django-secret
+  LTIConsumers:
+    name: LTI_CONSUMERS
+    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretKey: lti-consumers
+  BLTIAESKey:
+    name: BLTI_AES_KEY
+    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretKey: blti-aes-key
+  BLTIAESIV:
+    name: BLTI_AES_IV
+    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretKey: blti-aes-iv
+  canvasAPIToken:
+    name: CANVAS_OAUTH_BEARER
+    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretKey: canvas-api-token

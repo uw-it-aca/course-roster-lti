@@ -10,7 +10,7 @@ os:
 
 env:
   global:
-  - RELEASE_NAME="course_roster"
+  - RELEASE_NAME="course-roster"
   - DJANGO_APP="course_roster"
   - COMMIT_HASH="$(git rev-parse --short=7 HEAD)"
   - IMAGE_TAG="${RELEASE_NAME}:${COMMIT_HASH}"

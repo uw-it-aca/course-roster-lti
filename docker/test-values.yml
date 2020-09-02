@@ -81,7 +81,7 @@ externalSecrets:
 environmentVariablesSecrets:
   django-secret:
     name: DJANGO_SECRET
-    secretName: test-courseroster.canvas.uw.edu-canvas-secrets
+    secretName: test-courseroster.canvas.uw.edu-secrets
     secretKey: django-secret
   LTIConsumers:
     name: LTI_CONSUMERS
@@ -97,5 +97,5 @@ environmentVariablesSecrets:
     secretKey: blti-aes-iv
   canvasAPIToken:
     name: CANVAS_OAUTH_BEARER
-    secretName: test-courseroster.canvas.uw.edu-secrets
+    secretName: test-courseroster.canvas.uw.edu-canvas-secrets
     secretKey: canvas-api-token

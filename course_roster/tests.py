@@ -2,6 +2,7 @@ from django.test import TestCase
 from course_roster.dao.canvas import *
 from course_roster.dao.idcard import *
 import mock
+import re
 
 
 class CanvasDAOTest(TestCase):

@@ -49,7 +49,8 @@ class IDPhotoTest(TestCase):
 
         url = get_photo_url(reg_id, image_size)
 
-        url_key = url.replace('/roster/photos/', '')
+        result = re.search(r'/([a-z0-9]{16})$')
+        url_key = result.group(1)
 
         r = get_photo(url_key)
         mock_method.assert_called_with(reg_id, size=image_size)
@@ -57,15 +58,14 @@ class IDPhotoTest(TestCase):
         # Key no longer exists
         self.assertRaises(ObjectDoesNotExist, get_photo, url_key)
 
-    def test_get_url(self):
+    def test_get_photo_url(self):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         image_size = 120
 
         self.assertRegexpMatches(
-            get_photo_url(reg_id, image_size),
-            r'^/roster/photos/[a-z0-9]{16}')
+            get_photo_url(reg_id, image_size), r'/[a-z0-9]{16}$')
 
-    def test_get_url_with_invalid_reg_id(self):
+    def test_get_photo_url_with_invalid_reg_id(self):
         reg_id = 'invalid'
         image_size = 120
 

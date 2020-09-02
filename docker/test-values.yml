@@ -47,7 +47,7 @@ environmentVariables:
   - name: SESSION_BACKEND
     value: MEMCACHED
   - name: PWS_ENV
-    value: PROD
+    value: EVAL
   - name: CANVAS_ENV
     value: EVAL
   - name: CANVAS_TIMEOUT

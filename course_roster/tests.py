@@ -50,7 +50,7 @@ class IDPhotoTest(TestCase):
 
         url = get_photo_url(reg_id, image_size)
 
-        result = re.search(r'/([a-z0-9]{16})$')
+        result = re.search(r'/([a-z0-9]{16})$', url)
         url_key = result.group(1)
 
         r = get_photo(url_key)

@@ -5,10 +5,10 @@ INSTALLED_APPS += [
     'compressor',
 ]
 
-COMPRESS_ROOT = "/static/"
-COMPRESS_PRECOMPILERS = (("text/less", "lessc {infile} {outfile}"),)
+COMPRESS_ROOT = '/static/'
+COMPRESS_PRECOMPILERS = (('text/less', 'lessc {infile} {outfile}'),)
 COMPRESS_OFFLINE = True
-STATICFILES_FINDERS += ("compressor.finders.CompressorFinder",)
+STATICFILES_FINDERS += ('compressor.finders.CompressorFinder',)
 
 if os.getenv('ENV', 'localdev') == 'localdev':
     DEBUG = True
@@ -23,5 +23,5 @@ else:
     RESTCLIENTS_DAO_CACHE_CLASS = 'course_roster.cache.IDCardPhotoCache'
 
 COURSE_ROSTER_PER_PAGE = 50
-IDCARD_PHOTO_EXPIRES = 60 * 60
-IDCARD_TOKEN_EXPIRES = 60 * 60
+IDCARD_PHOTO_EXPIRES = 60 * 60 * 2
+IDCARD_TOKEN_EXPIRES = 60 * 60 * 2

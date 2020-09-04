@@ -1,4 +1,4 @@
-version: '2'
+version: '3.4'
 
 services:
   app:
@@ -14,6 +14,7 @@ services:
     container_name: app-courseroster
     build:
       context: .
+      target: app-container
     volumes:
       - ./course_roster:/app/course_roster
     ports:

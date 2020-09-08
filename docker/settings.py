@@ -13,13 +13,7 @@ STATICFILES_FINDERS += ('compressor.finders.CompressorFinder',)
 if os.getenv('ENV', 'localdev') == 'localdev':
     DEBUG = True
     RESTCLIENTS_DAO_CACHE_CLASS = None
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
-    }
 else:
-    DEBUG = False
     RESTCLIENTS_DAO_CACHE_CLASS = 'course_roster.cache.IDCardPhotoCache'
 
 COURSE_ROSTER_PER_PAGE = 50

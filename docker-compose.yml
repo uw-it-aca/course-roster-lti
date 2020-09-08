@@ -7,9 +7,6 @@ services:
       PORT: 8000
       AUTH: BLTI_DEV
       LTI_DEVELOP_APP: course_roster
-      MEMCACHED_SERVER_COUNT: 1
-      MEMCACHED_SERVER_SPEC: memcached
-      SESSION_BACKEND: MEMCACHED
     restart: always
     container_name: app-courseroster
     build:

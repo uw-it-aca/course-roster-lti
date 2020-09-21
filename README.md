@@ -3,16 +3,6 @@ UW Course Roster LTI App
 
 A Django LTI application for displaying a roster of course people, with official photos
 
-Installation
-------------
-
-**Project directory**
-
-Install the app in your project.
-
-    $ cd [project]
-    $ pip install UW-Course-Roster-LTI
-
 Project settings.py
 ------------------
 

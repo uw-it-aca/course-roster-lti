@@ -2,9 +2,6 @@ from django.conf import settings
 from uw_canvas.users import Users
 from uw_canvas.sections import Sections
 from uw_canvas.enrollments import Enrollments
-from logging import getLogger
-
-logger = getLogger(__name__)
 
 
 def get_users_for_course(course_id, user_id, page):

@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  app:
+    environment:
+      ENV: localdev
+      PORT: 8000
+      AUTH: BLTI_DEV
+      LTI_DEVELOP_APP: course_roster
+    restart: always
+    container_name: app-courseroster
+    build:
+      context: .
+      target: app-container
+    volumes:
+      - ./course_roster:/app/course_roster
+    ports:
+      - "8000:8000"

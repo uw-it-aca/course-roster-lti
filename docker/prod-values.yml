@@ -72,7 +72,7 @@ externalSecrets:
       data:
         - name: django-secret
           property: django-secret
-    - name: courseroster.canvas.uw.edu-canvas-secrets
+    - name: courseroster.canvas.uw.edu-shared-secrets
       externalKey: axdd/kv/data/course-roster/shared/secrets
       data:
         - name: lti-consumers
@@ -81,6 +81,9 @@ externalSecrets:
           property: blti-aes-key
         - name: blti-aes-iv
           property: blti-aes-iv
+    - name: courseroster.canvas.uw.edu-canvas-secrets
+      externalKey: axdd/kv/data/canvas/shared/secrets
+      data:
         - name: canvas-api-token
           property: canvas-api-token
     - name: courseroster.canvas.uw.edu-uwca-certs
@@ -97,15 +100,15 @@ environmentVariablesSecrets:
     secretKey: django-secret
   LTIConsumers:
     name: LTI_CONSUMERS
-    secretName: courseroster.canvas.uw.edu-canvas-secrets
+    secretName: courseroster.canvas.uw.edu-shared-secrets
     secretKey: lti-consumers
   BLTIAESKey:
     name: BLTI_AES_KEY
-    secretName: courseroster.canvas.uw.edu-canvas-secrets
+    secretName: courseroster.canvas.uw.edu-shared-secrets
     secretKey: blti-aes-key
   BLTIAESIV:
     name: BLTI_AES_IV
-    secretName: courseroster.canvas.uw.edu-canvas-secrets
+    secretName: courseroster.canvas.uw.edu-shared-secrets
     secretKey: blti-aes-iv
   canvasAPIToken:
     name: CANVAS_OAUTH_BEARER

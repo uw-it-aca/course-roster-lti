@@ -25,7 +25,7 @@ database:
 repo: course-roster
 instance: test
 image:
-  repository: registry.hub.docker.com/acait/course-roster
+  repository: gcr.io/uwit-mci-axdd/course-roster
   tag: IMAGE_TAG
 memcached:
   enabled: true

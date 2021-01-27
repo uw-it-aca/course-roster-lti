@@ -20,6 +20,8 @@ affinity:
    podsSpanNodes: true
 readiness:
   enabled: true
+securityPolicy:
+  enabled: true
 database:
   engine: null
 repo: course-roster

@@ -1,2 +1,0 @@
-include course_roster/VERSION
-recursive-include course_roster *

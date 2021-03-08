@@ -1,6 +1,5 @@
 trap 'exit 1' ERR
 
-# travis test script for django app
 #
 # PRECONDITION: inherited env vars MUST include:
 #      DJANGO_APP: django application directory name

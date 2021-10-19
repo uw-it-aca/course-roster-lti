@@ -3,13 +3,9 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 4
 targetAverageUtilization: 100
-resources:
-  limits:
-    cpu: 1.0
-    memory: 768Mi
-  requests:
-    cpu: 100m
-    memory: 700Mi
+affinity:
+   podsSpanNodes: true
+
 ingress:
   enabled: true
   tls:
@@ -24,31 +20,35 @@ ingress:
         - "/"
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
+
 lifecycle:
   enabled: true
   preStop:
     enabled: true
-affinity:
-   podsSpanNodes: true
 readiness:
   enabled: true
+
 database:
   engine: null
+
 repo: course-roster
 instance: prod
 image:
   repository: gcr.io/uwit-mci-axdd/course-roster
   tag: IMAGE_TAG
+
 memcached:
   enabled: true
   replicaCount: 2
   updateStrategy:
     type: RollingUpdate
+
 certs:
   mounted: true
   certPath: /certs/courseroster.canvas.uw.edu-uwca.cert
   keyPath: /certs/courseroster.canvas.uw.edu-uwca.key
   secretName: courseroster.canvas.uw.edu-uwca-certs
+
 environmentVariables:
   - name: CLUSTER_CNAME
     value: courseroster.canvas.uw.edu
@@ -64,6 +64,7 @@ environmentVariables:
     value: PROD
   - name: CANVAS_TIMEOUT
     value: "10"
+
 externalSecrets:
   enabled: true
   secrets:
@@ -93,6 +94,7 @@ externalSecrets:
           property: courseroster.canvas.uw.edu-uwca.cert
         - name: courseroster.canvas.uw.edu-uwca.key
           property: courseroster.canvas.uw.edu-uwca.key
+
 environmentVariablesSecrets:
   django-secret:
     name: DJANGO_SECRET

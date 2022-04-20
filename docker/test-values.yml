@@ -36,9 +36,9 @@ memcached:
     type: RollingUpdate
 certs:
   mounted: true
-  certPath: /certs/courseroster.canvas.uw.edu-uwca.cert
-  keyPath: /certs/courseroster.canvas.uw.edu-uwca.key
-  secretName: test-courseroster.canvas.uw.edu-uwca-certs
+  certPath: /certs/courseroster.canvas.uw.edu-ic.cert
+  keyPath: /certs/courseroster.canvas.uw.edu-ic.key
+  secretName: test-courseroster.canvas.uw.edu-ic-certs
 environmentVariables:
   - name: CLUSTER_CNAME
     value: test-courseroster.canvas.uw.edu
@@ -76,13 +76,13 @@ externalSecrets:
       data:
         - name: canvas-api-token
           property: canvas-api-token
-    - name: test-courseroster.canvas.uw.edu-uwca-certs
-      externalKey: axdd/kv/data/course-roster/prod/uwca-certs
+    - name: test-courseroster.canvas.uw.edu-ic-certs
+      externalKey: axdd/kv/data/course-roster/prod/ic-certs
       data:
-        - name: courseroster.canvas.uw.edu-uwca.cert
-          property: courseroster.canvas.uw.edu-uwca.cert
-        - name: courseroster.canvas.uw.edu-uwca.key
-          property: courseroster.canvas.uw.edu-uwca.key
+        - name: courseroster.canvas.uw.edu-ic.cert
+          property: courseroster.canvas.uw.edu-ic.cert
+        - name: courseroster.canvas.uw.edu-ic.key
+          property: courseroster.canvas.uw.edu-ic.key
 environmentVariablesSecrets:
   django-secret:
     name: DJANGO_SECRET

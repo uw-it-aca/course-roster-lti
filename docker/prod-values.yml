@@ -36,9 +36,6 @@ database:
 
 repo: course-roster
 instance: prod
-image:
-  repository: gcr.io/uwit-mci-axdd/course-roster
-  tag: IMAGE_TAG
 
 memcached:
   enabled: true
@@ -72,12 +69,12 @@ externalSecrets:
   enabled: true
   secrets:
     - name: courseroster.canvas.uw.edu-secrets
-      externalKey: axdd/kv/data/course-roster/prod/secrets
+      externalKey: course-roster/prod/secrets
       data:
         - name: django-secret
           property: django-secret
     - name: courseroster.canvas.uw.edu-shared-secrets
-      externalKey: axdd/kv/data/course-roster/shared/secrets
+      externalKey: course-roster/shared/secrets
       data:
         - name: lti-consumers
           property: lti-consumers
@@ -86,12 +83,12 @@ externalSecrets:
         - name: blti-aes-iv
           property: blti-aes-iv
     - name: courseroster.canvas.uw.edu-canvas-secrets
-      externalKey: axdd/kv/data/canvas/shared/secrets
+      externalKey: canvas/shared/secrets
       data:
         - name: canvas-api-token
           property: canvas-api-token
     - name: courseroster.canvas.uw.edu-ic-certs
-      externalKey: axdd/kv/data/course-roster/prod/ic-certs
+      externalKey: course-roster/prod/ic-certs
       data:
         - name: courseroster.canvas.uw.edu-ic.cert
           property: courseroster.canvas.uw.edu-ic.cert

@@ -66,8 +66,7 @@ class IDPhotoTest(TestCase):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         image_size = 120
 
-        self.assertRegexpMatches(
-            get_photo_url(reg_id, image_size), r'/[a-z0-9]{16}$')
+        self.assertRegex(get_photo_url(reg_id, image_size), r'/[a-z0-9]{16}$')
 
     def test_get_photo_url_with_invalid_reg_id(self):
         reg_id = 'invalid'

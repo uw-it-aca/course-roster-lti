@@ -1,4 +1,4 @@
-# Copyright 2023 UW-IT, University of Washington
+# Copyright 2024 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
 from django.test import TestCase
@@ -66,8 +66,7 @@ class IDPhotoTest(TestCase):
         reg_id = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
         image_size = 120
 
-        self.assertRegexpMatches(
-            get_photo_url(reg_id, image_size), r'/[a-z0-9]{16}$')
+        self.assertRegex(get_photo_url(reg_id, image_size), r'/[a-z0-9]{16}$')
 
     def test_get_photo_url_with_invalid_reg_id(self):
         reg_id = 'invalid'

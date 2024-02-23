@@ -1,9 +1,8 @@
-# Copyright 2023 UW-IT, University of Washington
+# Copyright 2024 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, StreamingHttpResponse
-from django.utils.timezone import utc
 from django.views.generic import View
 from blti.views import BLTILaunchView, RESTDispatch
 from restclients_core.exceptions import DataFailureException
@@ -11,7 +10,7 @@ from course_roster.dao.canvas import (
     get_users_for_course, get_viewable_sections)
 from course_roster.dao.idcard import (
     get_photo, get_photo_url, get_avatar_url)
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, parse_qs
 
 
@@ -33,7 +32,7 @@ class RosterPhoto(View):
 
     def get(self, request, *args, **kwargs):
         photo_key = kwargs.get('photo_key')
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         expires = now + timedelta(seconds=self.cache_time)
         try:
             response = StreamingHttpResponse(get_photo(photo_key),

@@ -46,8 +46,9 @@ class RosterPhoto(View):
             response['Last-Modified'] = now.strftime(self.date_format)
             return response
         except DataFailureException as err:
-            logger.info(f"ERROR get_idcard_photo for '{photo_key}': {err}")
-            return HttpResponse(status=503)
+            logger.info(f"ERROR in get_idcard_photo: {err.status} {err.url}")
+            status = 404 if (err.status == 404) else 503
+            return HttpResponse(status=status)
         except ObjectDoesNotExist:
             status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404
             return HttpResponse(status=status)

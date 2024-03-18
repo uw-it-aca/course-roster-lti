@@ -12,6 +12,9 @@ from course_roster.dao.idcard import (
     get_photo, get_photo_url, get_avatar_url)
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse, parse_qs
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 
 class LaunchView(BLTILaunchView):
@@ -42,7 +45,8 @@ class RosterPhoto(View):
             response['Expires'] = expires.strftime(self.date_format)
             response['Last-Modified'] = now.strftime(self.date_format)
             return response
-        except DataFailureException:
+        except DataFailureException as err:
+            logger.info(f"ERROR get_idcard_photo for '{photo_key}': {err}")
             return HttpResponse(status=503)
         except ObjectDoesNotExist:
             status = 304 if ('HTTP_IF_MODIFIED_SINCE' in request.META) else 404

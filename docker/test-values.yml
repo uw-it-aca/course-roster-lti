@@ -80,7 +80,7 @@ externalSecrets:
         - name: canvas-api-token
           property: canvas-api-token
     - name: test-courseroster.canvas.uw.edu-lti-keys
-      externalKey: test-courseroster/test/lti-keys
+      externalKey: course-roster/test/lti-keys
       data:
         - name: private-key-1.key
           property: private-key-1.key

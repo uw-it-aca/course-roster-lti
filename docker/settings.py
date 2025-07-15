@@ -19,3 +19,7 @@ else:
 COURSE_ROSTER_PER_PAGE = 50
 IDCARD_PHOTO_EXPIRES = 60 * 60 * 2
 IDCARD_TOKEN_EXPIRES = 60 * 60 * 2
+
+MIDDLEWARE += [
+    'blti.middleware.LTISessionAuthenticationMiddleware',
+]

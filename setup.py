@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     install_requires = [
         'Django~=4.2',
-        'django-blti~=2.2',
+        'django-blti~=3.0',
         'django-compressor',
         'uw-memcached-clients~=1.0',
         'UW-RestClients-Core~=1.4',

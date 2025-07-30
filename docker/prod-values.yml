@@ -36,6 +36,8 @@ database:
 
 repo: course-roster
 instance: prod
+namespace:
+  enabled: true
 
 memcached:
   enabled: true
@@ -64,6 +66,8 @@ environmentVariables:
     value: PROD
   - name: CANVAS_TIMEOUT
     value: "10"
+  - name: LTI_CONFIG_DIRECTORY
+    value: /lti/config
 
 externalSecrets:
   enabled: true
@@ -87,6 +91,13 @@ externalSecrets:
       data:
         - name: canvas-api-token
           property: canvas-api-token
+    - name: courseroster.canvas.uw.edu-lti-keys
+      externalKey: course-roster/prod/lti-keys
+      data:
+        - name: private-key-1.key
+          property: private-key-1.key
+        - name: public-key-1.key
+          property: public-key-1.key
     - name: courseroster.canvas.uw.edu-ic-certs
       externalKey: course-roster/prod/ic-certs
       data:
@@ -116,3 +127,34 @@ environmentVariablesSecrets:
     name: CANVAS_OAUTH_BEARER
     secretName: courseroster.canvas.uw.edu-canvas-secrets
     secretKey: canvas-api-token
+
+mountedSecrets:
+  enabled: true
+  mountPath: /lti/keys
+  secretName: courseroster.canvas.uw.edu-lti-keys
+
+podVolumes:
+  lti-tool-config:
+    volume:
+      configMap:
+        name: lti-tool-config
+    mount:
+      mountPath: /lti/config
+    containers: [base]
+
+configmaps:
+  lti-tool-config:
+    tool.json: |
+      {
+        "https://canvas.instructure.com": [{
+          "default": true,
+          "client_id": "100000000000815",
+          "auth_login_url": "https://sso.canvaslms.com/api/lti/authorize_redirect",
+          "auth_token_url": "https://sso.canvaslms.com/login/oauth2/token",
+          "key_set": null,
+          "key_set_url": "https://sso.canvaslms.com/api/lti/security/jwks",
+          "private_key_file": "/lti/keys/private-key-1.key",
+          "public_key_file": "/lti/keys/public-key-1.key",
+          "deployment_ids": ["214724:c78d46b24c785a8ad37b5bf9bdf26ceb32cc9d18"]
+        }]
+      }

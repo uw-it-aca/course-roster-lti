@@ -55,7 +55,7 @@
 
     function load_next_photo() {
         var el = $('a.person-photo:empty').first();
-        if (el.length === 1) {
+        if (el.length === 2) {
             $('<img/>').load(image_loaded).error(load_avatar)
                        .prepend(el).attr('src', el.attr('data-photo'));
         } else {

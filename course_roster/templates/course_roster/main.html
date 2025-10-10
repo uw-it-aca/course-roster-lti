@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="course-roster-container">
-    <a href="javascript:window.print()" title="Print this page" class="btn btn-primary" role="button"><i class="fa fa-print"></i> Print</a>
+    <a href="javascript:window.print()" title="Print this page" class="btn btn-primary btn-sm" role="button"><i class="fa fa-print"></i> Print</a>
 
     <h2 id="course-roster-header">Student Photos for {{course_name}}</h2>
 
     <div id="filter-container" class="form-inline">
         <input type="text" id="search-filter" class="form-control" aria-label="Filter students. As you type in this field, the list of students will be automatically filtered to only include those whose names match your input." placeholder="Search students" name="search_term"/>
-        <span id="filtering" class="hidden filter-spinner"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
+        <span id="filtering" class="visually-hidden filter-spinner"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
         <span id="filter-count"></span>
     </div>
 
@@ -34,13 +34,10 @@
 <script id="thumbnail-grid-tmpl" type="text/x-handlebars-template">
 {{# each people}}
     <div class="person-container hidden col-sm-2 col-xs-3" data-sections="{{# each sections}}{{this}}:{{/each}}" data-names="{{search_name}}">
-        <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}"></a><br/>
-        <div class="name-container">
-            <a href="{{user_url}}" target="_top" title="{{name}}'s Canvas profile">
-                <span class="name">{{nonbreaking name}}</span>
-                <span class="login-id">{{login_id}}</span>
-            </a>
-        </div>
+        <a class="person-photo" href="{{user_url}}" target="_top" data-photo="{{photo_url}}" data-avatar="{{avatar_url}}" title="{{name}}'s Canvas profile">
+            <span class="name">{{nonbreaking name}}</span>
+            <span class="login-id">{{login_id}}</span>
+        </a>
     </div>
 {{/each}}
 </script>

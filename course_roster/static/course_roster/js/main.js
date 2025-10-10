@@ -55,9 +55,13 @@
 
     function load_next_photo() {
         var el = $('a.person-photo:empty').first();
-        if (el.length === 2) {
+        if (el.length === 1) {
             $('<img/>').load(image_loaded).error(load_avatar)
-                       .prepend(el).attr('src', el.attr('data-photo'));
+                       .appendTo(el).attr('src', el.attr('data-photo'));
+            $('<span/>').appendTo(el).attr('class', 'name')
+                        .text(el.attr('data-name'));
+            $('<span/>').appendTo(el).attr('class', 'login-id')
+                        .text(el.attr('data-login'));
         } else {
             $('.loading').hide();
             if (next_page) {

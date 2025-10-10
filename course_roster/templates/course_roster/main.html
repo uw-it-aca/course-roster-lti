@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="course-roster-container">
-    <a href="javascript:window.print()" title="Print this page" class="btn btn-primary" role="button"><i class="fa fa-print"></i> Print</a>
+    <a href="javascript:window.print()" title="Print this page" class="btn btn-primary btn-sm" role="button"><i class="fa fa-print"></i> Print</a>
 
     <h2 id="course-roster-header">Student Photos for {{course_name}}</h2>
 
     <div id="filter-container" class="form-inline">
         <input type="text" id="search-filter" class="form-control" aria-label="Filter students. As you type in this field, the list of students will be automatically filtered to only include those whose names match your input." placeholder="Search students" name="search_term"/>
-        <span id="filtering" class="hidden filter-spinner"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
+        <span id="filtering" class="visually-hidden filter-spinner"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
         <span id="filter-count"></span>
     </div>
 

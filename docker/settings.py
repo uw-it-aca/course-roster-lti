@@ -16,6 +16,8 @@ if os.getenv('ENV', 'localdev') == 'localdev':
 else:
     RESTCLIENTS_DAO_CACHE_CLASS = 'course_roster.cache.IDCardPhotoCache'
 
+RESTCLIENTS_CANVAS_USER_AGENT = 'UW-CourseRoster-LTI/0.1'
+
 COURSE_ROSTER_PER_PAGE = 50
 IDCARD_PHOTO_EXPIRES = 60 * 60 * 2
 IDCARD_TOKEN_EXPIRES = 60 * 60 * 2

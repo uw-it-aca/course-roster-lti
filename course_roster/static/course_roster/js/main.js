@@ -57,7 +57,7 @@
         var el = $('a.person-photo:empty').first();
         if (el.length === 1) {
             $('<img/>').load(image_loaded).error(load_avatar)
-                       .appendTo(el).attr('src', el.attr('data-photo'));
+                       .prepend(el).attr('src', el.attr('data-photo'));
         } else {
             $('.loading').hide();
             if (next_page) {

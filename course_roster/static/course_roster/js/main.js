@@ -57,7 +57,7 @@
         var el = $('a.person-photo:empty').first();
         if (el.length === 1) {
             $('<img/>').load(image_loaded).error(load_avatar).appendTo(el)
-                        .attr('alt', el.attr('data-name'))
+                        .attr('alt', el.attr('data-name') + "'s student photo")
                         .attr('src', el.attr('data-photo'));
             $('<div/>').appendTo(el)
                         .attr('class', 'name fw-bold text-truncate')

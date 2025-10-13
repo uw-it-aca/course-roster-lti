@@ -56,12 +56,14 @@
     function load_next_photo() {
         var el = $('a.person-photo:empty').first();
         if (el.length === 1) {
-            $('<img/>').load(image_loaded).error(load_avatar)
-                        .attr('alt', 'Student name photo')
-                        .appendTo(el).attr('src', el.attr('data-photo'));
-            $('<div/>').appendTo(el).attr('class', 'name fw-bold text-truncate')
+            $('<img/>').load(image_loaded).error(load_avatar).appendTo(el)
+                        .attr('alt', el.attr('data-name'))
+                        .attr('src', el.attr('data-photo'));
+            $('<div/>').appendTo(el)
+                        .attr('class', 'name fw-bold text-truncate')
                         .text(el.attr('data-name'));
-            $('<div/>').appendTo(el).attr('class', 'login-id')
+            $('<div/>').appendTo(el)
+                        .attr('class', 'login-id')
                         .text(el.attr('data-login'));
         } else {
             $('.loading').hide();

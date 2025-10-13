@@ -7,8 +7,8 @@
     </div>
     <h2 id="course-roster-header">Student Photos for {{course_name}}</h2>
 
-    <div id="filter-container" class="form-inline">
-        <input type="text" id="search-filter" class="form-control" aria-label="Filter students. As you type in this field, the list of students will be automatically filtered to only include those whose names match your input." placeholder="Search students" name="search_term"/>
+    <div id="filter-container" class="grid">
+        <input type="text" id="search-filter" class="g-col-6 form-control" aria-label="Filter students. As you type in this field, the list of students will be automatically filtered to only include those whose names match your input." placeholder="Search students" name="search_term"/>
         <span id="filtering" class="visually-hidden filter-spinner"><i class="fa fa-spinner fa-spin fa-2x"></i></span>
         <span id="filter-count"></span>
     </div>
@@ -24,7 +24,7 @@
 
 {% verbatim %}
 <script id="section-filter-tmpl" type="text/x-handlebars-template">
-<select id="section-filter" aria-label="Limit search to section" name="section" class="form-select">
+<select id="section-filter" aria-label="Limit search to section" name="section" class="g-col-6 form-select">
     <option value="">All Sections</option>{{# each sections}}
     <option value="{{id}}">{{name}}</option>{{/each}}
 </select>

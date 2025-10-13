@@ -59,7 +59,7 @@
             $('<img/>').load(image_loaded).error(load_avatar)
                         .attr('alt', 'Student name photo')
                         .appendTo(el).attr('src', el.attr('data-photo'));
-            $('<div/>').appendTo(el).attr('class', 'name fw-bold')
+            $('<div/>').appendTo(el).attr('class', 'name fw-bold text-truncate')
                         .text(el.attr('data-name'));
             $('<div/>').appendTo(el).attr('class', 'login-id')
                         .text(el.attr('data-login'));

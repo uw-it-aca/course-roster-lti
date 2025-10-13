@@ -24,7 +24,7 @@
 
 {% verbatim %}
 <script id="section-filter-tmpl" type="text/x-handlebars-template">
-<select id="section-filter" aria-label="Limit search to section" name="section" class="form-control">
+<select id="section-filter" aria-label="Limit search to section" name="section" class="form-select">
     <option value="">All Sections</option>{{# each sections}}
     <option value="{{id}}">{{name}}</option>{{/each}}
 </select>

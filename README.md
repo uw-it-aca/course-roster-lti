@@ -1,6 +1,6 @@
 # UW Course Roster LTI App
 
-[![Build Status](https://github.com/uw-it-aca/course-roster-lti/workflows/Build%2C%20Test%20and%20Deploy/badge.svg?branch=main)](https://github.com/uw-it-aca/course-roster-lti/actions)
+[![Build Status](https://github.com/uw-it-aca/course-roster-lti/workflows/Build%2C%20Test%20and%20Deploy/badge.svg)](https://github.com/uw-it-aca/course-roster-lti/actions)
 [![Coverage Status](https://coveralls.io/repos/github/uw-it-aca/course-roster-lti/badge.svg?branch=main)](https://coveralls.io/github/uw-it-aca/course-roster-lti?branch=main)
 
 A Django LTI application for displaying a roster of course people, with official photos

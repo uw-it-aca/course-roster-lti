@@ -24,7 +24,7 @@ setup(
         'django-compressor',
         'uw-memcached-clients~=1.0',
         'uw-restclients-core~=1.4',
-        'uw-restclients-canvas>=1.2.27',
+        'uw-restclients-canvas~=1.2',
         'uw-restclients-pws~=2.1',
     ],
     license='Apache License, Version 2.0',

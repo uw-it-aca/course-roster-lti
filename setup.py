@@ -19,7 +19,7 @@ setup(
     packages=['course_roster'],
     include_package_data=True,
     install_requires = [
-        'django~=4.2',
+        'django~=5.2',
         'django-blti~=3.0',
         'django-compressor',
         'uw-memcached-clients~=1.0',

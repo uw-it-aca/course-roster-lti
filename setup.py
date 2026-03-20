@@ -31,7 +31,7 @@ setup(
     description='Display a roster of UW course people, with official photos',
     long_description=README,
     url='https://github.com/uw-it-aca/course-roster-lti',
-    author = "UW-IT Student & Educational Technology Services",
+    author = "UWIT Student & Educational Technology Services",
     author_email = "aca-it@uw.edu",
     classifiers=[
         'Environment :: Web Environment',

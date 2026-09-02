@@ -1,18 +1,18 @@
 # Copyright 2026 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
+from datetime import datetime, timedelta, timezone
+from logging import getLogger
+from urllib.parse import parse_qs, urlparse
+
+from blti.views import BLTILaunchView, RESTDispatch
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, StreamingHttpResponse
 from django.views.generic import View
-from blti.views import BLTILaunchView, RESTDispatch
 from restclients_core.exceptions import DataFailureException
-from course_roster.dao.canvas import (
-    get_users_for_course, get_viewable_sections)
-from course_roster.dao.idcard import (
-    get_photo, get_photo_url, get_avatar_url)
-from datetime import datetime, timedelta, timezone
-from urllib.parse import urlparse, parse_qs
-from logging import getLogger
+
+from course_roster.dao.canvas import get_users_for_course, get_viewable_sections
+from course_roster.dao.idcard import get_avatar_url, get_photo, get_photo_url
 
 logger = getLogger(__name__)
 
@@ -40,8 +40,7 @@ class RosterPhoto(View):
         try:
             response = StreamingHttpResponse(get_photo(photo_key),
                                              content_type='image/jpeg')
-            response['Cache-Control'] = 'public,max-age={}'.format(
-                self.cache_time)
+            response['Cache-Control'] = f'public,max-age={self.cache_time}'
             response['Expires'] = expires.strftime(self.date_format)
             response['Last-Modified'] = now.strftime(self.date_format)
             return response
@@ -74,7 +73,7 @@ class CourseRoster(RESTDispatch):
         people = []
         for user in users:
             avatar_url = get_avatar_url(user.avatar_url, image_size)
-            search_name = '{} {}'.format(user.name, user.login_id)
+            search_name = f'{user.name} {user.login_id}'
             people.append({
                 'user_url': user.enrollments[0].html_url,
                 'photo_url': get_photo_url(
@@ -89,7 +88,7 @@ class CourseRoster(RESTDispatch):
         try:
             url_parts = urlparse(next_url)
             next_page = parse_qs(url_parts.query).get('page', [])[0]
-        except Exception as err:
+        except Exception:
             next_page = None
 
         return self.json_response({

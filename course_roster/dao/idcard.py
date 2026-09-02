@@ -1,18 +1,19 @@
 # Copyright 2026 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.cache import cache
-from django.urls import reverse
-from uw_pws import PWS
-from urllib.parse import urlparse, urlunparse
 import random
 import string
+from urllib.parse import urlparse, urlunparse
+
+from django.conf import settings
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
+from uw_pws import PWS
 
 
 def cache_key(key):
-    return 'idphoto-key-{}'.format(key)
+    return f'idphoto-key-{key}'
 
 
 def get_photo(photo_key):
@@ -45,7 +46,6 @@ def get_avatar_url(url, image_size):
     """
     url_parts = urlparse(url)
     if 'gravatar.com' in url_parts.netloc:
-        new_parts = url_parts._replace(
-            query='s={}&d=mm'.format(image_size))
+        new_parts = url_parts._replace(query=f's={image_size}&d=mm')
         return urlunparse(new_parts)
     return url

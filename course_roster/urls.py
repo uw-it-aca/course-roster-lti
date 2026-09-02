@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from django.urls import re_path
-from course_roster.views import (
-    LaunchView, CourseRoster, CourseSections, RosterPhoto)
+
+from course_roster.views import CourseRoster, CourseSections, LaunchView, RosterPhoto
 
 urlpatterns = [
     re_path(r'^$', LaunchView.as_view(), name="lti-launch"),

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from django.conf import settings
-from uw_canvas.users import Users
-from uw_canvas.sections import Sections
 from uw_canvas.enrollments import Enrollments
+from uw_canvas.sections import Sections
+from uw_canvas.users import Users
 
 
 def get_users_for_course(course_id, user_id, page):

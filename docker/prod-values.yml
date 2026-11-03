@@ -14,21 +14,6 @@ gateway:
   hostnames:
     - courseroster.canvas.uw.edu
 
-ingress:
-  enabled: true
-  tls:
-    courseroster:
-      secretName: courseroster.canvas.uw.edu-ingress-cert
-      hosts:
-        - courseroster.canvas.uw.edu
-  hosts:
-    courseroster:
-      host: courseroster.canvas.uw.edu
-      paths:
-        - "/"
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-
 lifecycle:
   enabled: true
   preStop:

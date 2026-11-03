@@ -1,8 +1,0 @@
-[run]
-source = course-roster-lti
-parallel = True
-
-[paths]
-source =
-  course_roster/
-  /app/course_roster/

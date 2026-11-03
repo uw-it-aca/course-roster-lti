@@ -1,7 +1,7 @@
 # Copyright 2026 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from logging import getLogger
 from urllib.parse import parse_qs, urlparse
 
@@ -35,7 +35,7 @@ class RosterPhoto(View):
 
     def get(self, request, *args, **kwargs):
         photo_key = kwargs.get('photo_key')
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         expires = now + timedelta(seconds=self.cache_time)
         try:
             response = StreamingHttpResponse(get_photo(photo_key),

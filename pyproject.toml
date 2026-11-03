@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Course-Roster-LTI"
+dynamic = ["version"]
+description = "Display a roster of UW course people, with official photos"
+readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    {name = "UWIT Student & Educational Technology Services", email = "aca-it@uw.edu"}
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+]
+dependencies = [
+    "django~=5.2",
+    "django-blti~=3.0",
+    "django-compressor",
+    "uw-memcached-clients~=1.0",
+    "uw-restclients-core~=1.4",
+    "uw-restclients-canvas~=1.2",
+    "uw-restclients-pws~=2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+]
+
+[tool.setuptools]
+packages = ["course_roster"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {file = "course_roster/VERSION"}
+
+[tool.ruff]
+line-length = 88
+exclude = [
+]
+
+[tool.ruff.lint]
+ignore = [
+    "BLE001",  # allow broad Exception catches
+]
+
+[tool.coverage.run]
+source = ["course-roster-lti"]
+parallel = true
+omit = [
+     "course_roster/tests.py"
+]
+
+[tool.coverage.paths]
+source = [
+    "course_roster/",
+    "/app/course_roster/",
+]
